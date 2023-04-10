@@ -1,0 +1,49 @@
+@startuml
+'Entities
+class Person {
+string name
+string contact
+string geo
+number group
+}
+
+class Register {
+number pk
+Person info
+string pwd
+file profile
+string mbti
+date createdAt
+date updatedAt
+void setProfile()
+void setMBTI()
+}
+class Alert {
+number pk
+Register register
+Match | Reveal type
+date createdAt
+Alert[] showMyAlert(Register me)
+}
+class Match {
+number pk
+Register from
+Register to
+date createdAt
+date updatedAt
+Register[] findMyMatch(Register me)
+}
+class Reveal {
+number pk
+Register from
+Register to
+date createdAt
+date updatedAt
+Register[] getMyReveal(Register me)
+}
+'Relationships
+Person <|- Register
+Register - Alert
+Register --{ Match
+Register --{ Reveal
+@enduml
