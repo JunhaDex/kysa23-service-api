@@ -1,34 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import type { Register } from './entities/register.entity';
-import { credential, initializeApp } from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
 
 @Injectable()
 export class RegisterService {
-  private fireStore;
+  private readonly fireStore;
 
   constructor() {
-    this.fireStore = initializeApp({
-      credential: credential.applicationDefault(),
-    });
+    const app = initializeApp();
   }
 
   create(register: Register) {
     return 'This action adds a new register';
   }
 
-  findAll() {
+  async findAll(options?: any) {
     return `This action returns all register`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} register`;
   }
 
-  update(register: Register) {
+  update(id: string, register: Register) {
     return `This action updates a #${id} register`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} register`;
   }
 }

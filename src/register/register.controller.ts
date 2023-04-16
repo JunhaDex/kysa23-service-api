@@ -1,34 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RegisterService } from './register.service';
-import { CreateRegisterDto } from './dto/create-register.dto';
-import { UpdateRegisterDto } from './dto/update-register.dto';
+import { Register } from './entities/register.entity';
 
 @Controller('register')
 export class RegisterController {
   constructor(private readonly registerService: RegisterService) {}
 
   @Post()
-  create(@Body() createRegisterDto: CreateRegisterDto) {
-    return this.registerService.create(createRegisterDto);
+  create(@Body() regInfo: Register) {
+    return this.registerService.create(regInfo);
   }
 
   @Get()
-  findAll() {
-    return this.registerService.findAll();
+  async findAll(@Param() params) {
+    return await this.registerService.findAll({ page: params.page });
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.registerService.findOne(+id);
+    return this.registerService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRegisterDto: UpdateRegisterDto) {
-    return this.registerService.update(+id, updateRegisterDto);
+  update(@Param('id') id: string, @Body() regInfo: Register) {
+    return this.registerService.update(id, regInfo);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.registerService.remove(+id);
+    return this.registerService.remove(id);
   }
 }
