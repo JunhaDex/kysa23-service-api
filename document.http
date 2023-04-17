@@ -1,8 +1,10 @@
 ### get all
 GET http://localhost:3000/register
+Content-Type: application/json
 
 ### get one
 GET http://localhost:3000/register/bar@example-com
+Content-Type: application/json
 
 ### create one
 POST http://localhost:3000/register
