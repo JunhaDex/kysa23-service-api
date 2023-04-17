@@ -1,12 +1,13 @@
 export interface Register {
-  uid: number;
+  uid: string;
+  email: string;
   name: string;
-  age: string;
-  geo: string;
+  dob: string;
+  sex: 'm' | 'f';
   contact: string;
-  group: string;
-  profile: string;
-  mbti: string;
+  geo: string;
+  isMember: boolean;
+  joins: number[];
   createdAt: Date;
   updatedAt: Date;
 }

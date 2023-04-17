@@ -6,13 +6,18 @@ import {
   Patch,
   Param,
   Delete,
+  Logger,
 } from '@nestjs/common';
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
 
 @Controller('register')
 export class RegisterController {
-  constructor(private readonly registerService: RegisterService) {}
+  private readonly logger;
+
+  constructor(private readonly registerService: RegisterService) {
+    this.logger = new Logger(RegisterController.name);
+  }
 
   @Post()
   create(@Body() regInfo: Register) {
@@ -25,8 +30,8 @@ export class RegisterController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.registerService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.registerService.findOne(id);
   }
 
   @Patch(':id')
