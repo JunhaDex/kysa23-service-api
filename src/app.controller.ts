@@ -1,6 +1,8 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import * as sgMail from '@sendgrid/mail';
+import { getFirebase } from './providers/firebase.provider';
+import { getAuth } from 'firebase-admin/auth';
 
 @Controller()
 export class AppController {
@@ -9,6 +11,14 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Get('/temp')
+  async getToken(): Promise<string> {
+    const app = getFirebase();
+    const auth = getAuth(app);
+    const uid = 'foo-bar';
+    return await auth.createCustomToken(uid);
   }
 
   @Post('/send')

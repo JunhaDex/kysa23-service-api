@@ -8,6 +8,6 @@ export interface Register {
   geo: string;
   isMember: boolean;
   joins: number[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: number; // unix
+  updatedAt: number; // unix
 }

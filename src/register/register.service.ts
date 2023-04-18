@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import type { Register } from './entities/register.entity';
-import { applicationDefault, initializeApp } from 'firebase-admin/app';
 import { getDatabase } from 'firebase-admin/database';
-import * as process from 'process';
+import { unixNow } from '../utils/index.util';
+import { getFirebase } from '../providers/firebase.provider';
 
 const DB_NAME = 'test';
 
@@ -11,37 +11,23 @@ export class RegisterService {
   private readonly db;
 
   constructor() {
-    const app = initializeApp({
-      credential: applicationDefault(),
-      databaseURL: process.env.FS_DATABASE_URL,
-    });
+    const app = getFirebase();
     this.db = getDatabase(app);
   }
 
-  create(register: Register) {
-    console.log(btoa(register.email), register);
-    return 'This action adds a new register';
-  }
-
-  async findAll(options?: any) {
-    const ref = this.db.ref(DB_NAME);
-    const data = await ref.once('value');
-    console.log(data.val());
-    return `This action returns all register`;
-  }
-
-  async findOne(id: string) {
-    const ref = this.db.ref(`${DB_NAME}/${id}`);
-    const data = await ref.once('value');
-    console.log(data.val());
-    return `This action returns a #${id} register`;
-  }
-
-  update(id: string, register: Register) {
-    return `This action updates a #${id} register`;
-  }
-
-  remove(id: string) {
-    return `This action removes a #${id} register`;
+  async create(register: Register) {
+    const document = this.db.ref(DB_NAME);
+    const key = btoa(register.email);
+    const instance = await document.child(key).once('value');
+    if (!instance.val()) {
+      const record: Register = { ...register };
+      const current = unixNow();
+      record.uid = key;
+      record.createdAt = current;
+      record.updatedAt = current;
+      await document.child(key).set(record);
+      return true;
+    }
+    return false;
   }
 }
