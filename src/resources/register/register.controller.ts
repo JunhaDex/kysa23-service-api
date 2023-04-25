@@ -1,11 +1,7 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   Logger,
 } from '@nestjs/common';
 import { RegisterService } from './register.service';

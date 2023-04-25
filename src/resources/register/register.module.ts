@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { RegisterService } from './register.service';
 import { RegisterController } from './register.controller';
-import { FireauthMiddleware } from '../middleware/fireauth.middleware';
+import { FireauthMiddleware } from '@/middleware/fireauth.middleware';
 
 @Module({
   controllers: [RegisterController],
