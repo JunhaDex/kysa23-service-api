@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import type { Register } from './entities/register.entity';
 import { getDatabase } from 'firebase-admin/database';
-import { unixNow } from '../utils/index.util';
-import { getFirebase } from '../providers/firebase.provider';
+import { unixNow } from '@/utils/index.util';
+import { getFirebase } from '@/providers/firebase.provider';
 
 const DB_NAME = 'test';
 
