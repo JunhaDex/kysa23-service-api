@@ -1,8 +1,8 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { getAuth } from 'firebase-admin/auth';
-import { Response } from '../types/request.type';
-import { unixNow } from '../utils/index.util';
-import { getFirebase } from '../providers/firebase.provider';
+import { Response } from '@/types/general.type';
+import { unixNow } from '@/utils/index.util';
+import { getFirebase } from '@/providers/firebase.provider';
 
 @Injectable()
 export class FireauthMiddleware implements NestMiddleware {

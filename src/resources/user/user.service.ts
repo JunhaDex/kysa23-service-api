@@ -23,7 +23,7 @@ export class UserService {
     this.db = getDatabase(app);
   }
 
-  async update(user: User): Promise<boolean> {
+  async update(id: string, user: User): Promise<boolean> {
     const doc = this.db.ref(DOC_NAME_USER);
     const key = btoa(user.email);
     const instance = await doc.child(key).once('value');

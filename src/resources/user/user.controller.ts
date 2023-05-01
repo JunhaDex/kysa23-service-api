@@ -5,53 +5,91 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Query,
+  HttpStatus,
+  HttpException,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { User, UserCredential } from '@/resources/user/entities/user.entity';
+import { okMessage } from '@/utils/index.util';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   /**
-   * POST /user/new
-   * add app user information
-   * user record already created from registers
-   * @param createUserDto
+   * GET /user/my
+   * update user info
+   * get uid from middleware
+   * @param req: req.uid auth middleware
+   * @param userInfo: user info to update
    */
-  @Post('new')
-  create(@Body() createUserDto: any) {
-    return this.userService.create(createUserDto);
+  @Patch('my')
+  async update(@Req() req: any, @Body() userInfo: User) {
+    const uid = req.uid;
+    if (await this.userService.update(uid, userInfo)) {
+      return okMessage;
+    } else {
+      throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
+    }
+  }
+
+  /**
+   * GET /user/inbox
+   * update user info
+   * get uid from middleware
+   * @param req: req.uid auth middleware
+   * @param options: query options
+   */
+  @Get('inbox')
+  async userInbox(
+    @Req() req: any,
+    @Query()
+    options?: {
+      page: number;
+    },
+  ) {
+    const uid = req.uid;
+    return this.userService.getInbox(uid, options);
   }
 
   /**
    * POST /user/login
    * check ID, PW and update FCM
-   * @param createUserDto
+   * @Param credential: User ID, PWD, FCM
    */
   @Post('login')
-  login(@Body() createUserDto: any) {
+  login(@Body() credential: UserCredential) {
     // TODO update FCM, return new auth token
-    return this.userService.create(createUserDto);
+    return this.userService.login(credential);
   }
 
   /**
-   * Get user list
+   * Get /user/list
    * Filter by group
+   * @Params options: query options
    */
   @Get('list')
-  findAll() {
-    return this.userService.findAll();
+  async findAll(
+    @Query()
+    options?: {
+      page: number;
+      geo?: string;
+      name?: string;
+      group?: string;
+    },
+  ) {
+    return this.userService.getList(options);
   }
 
+  /**
+   * GET user/:id
+   * get single user record
+   * @param id
+   */
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch('me')
-  update(@Body() updateUserDto: any) {
-    const id = 0;
-    return this.userService.update(id, updateUserDto);
+  async findOne(@Param('id') id: string) {
+    return this.userService.getUser(id);
   }
 }

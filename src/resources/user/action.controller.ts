@@ -1,17 +1,29 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('send')
-export class UserController {
+export class UserActionController {
   constructor(private readonly userService: UserService) {}
 
+  /**
+   * POST /send/match
+   * @param req: req.uid sender id
+   * @param rid: recipient id
+   */
   @Post('match')
-  sendMatch(@Body() createUserDto: any) {
-    return this.userService.create(createUserDto);
+  sendMatch(@Req() req: any, @Body('recipientId') rid: string) {
+    const sid = req.uid;
+    return this.userService.sendContact(sid, rid);
   }
 
+  /**
+   * POST /send/contact
+   * @param req: req.uid sender id
+   * @param rid: recipient id
+   */
   @Post('contact')
-  sendContact(@Body() createUserDto: any) {
-    return this.userService.create(createUserDto);
+  sendContact(@Req() req: any, @Body('recipientId') rid: string) {
+    const sid = req.uid;
+    return this.userService.sendMatch(sid, rid);
   }
 }
