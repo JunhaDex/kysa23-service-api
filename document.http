@@ -8,16 +8,16 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTY4MTgwNjE2OSwiZXhwIjoxNjgxODA5NzY5LCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay04MTFpOEBreXNhMjMtcHJvamVjdC5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6ImZpcmViYXNlLWFkbWluc2RrLTgxMWk4QGt5c2EyMy1wcm9qZWN0LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiZm9vLWJhciJ9.dHdiltrW39Gh-othLjnj9-6R__wLU6wjHKi3QjlwUGMzxuDJ59NJqOhjr8KEe6RliZKULn7NUUCz7b3omPjgGBg-YPA_XDZAfTLiNUlY4PhIxJE07Y63-sxcrcgrkcD1UJ8hJdG-5ybiQ3H3HnfHFEQa_bVuoZcmGP3BaQ62SgqVpHl4rDnDa887Ia2Nr8Wuj2lfD2L-E4ubYrJ1ue2KBsM9AsMwKsPVxsH90Jx-1v0SJyFGpndgq80Bt6h6qL80NttGZVzbriJb-ZyO0ztg2JMtHw-VkdmFWKOucS9Fi4JQxCcS0mupU4weg75jm-pq0Ce14J4KgVDtj93nDwgCxw
 
 {
-  "email": "foo@example.com",
-  "name": "string",
-  "dob": "string",
-  "sex": "m",
-  "contact": "string",
+  "email": "virginia2@hotmail.com",
+  "name": "이은지",
+  "dob": "2001/09/16",
+  "sex": "f",
+  "contact": "010-9565-3646",
   "geo": "string",
-  "isMember": false,
+  "isMember": true,
   "joins": [
-    1,
-    2,
-    33
+    25,
+    26,
+    27
   ]
 }

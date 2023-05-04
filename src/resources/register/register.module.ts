@@ -14,8 +14,8 @@ import { FireauthMiddleware } from '@/middleware/fireauth.middleware';
 })
 export class RegisterModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer
-      .apply(FireauthMiddleware)
-      .forRoutes({ path: '/register', method: RequestMethod.POST });
+    // consumer
+    //   .apply(FireauthMiddleware)
+    //   .forRoutes({ path: '/register', method: RequestMethod.POST });
   }
 }

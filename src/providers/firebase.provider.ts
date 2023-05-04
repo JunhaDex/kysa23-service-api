@@ -7,6 +7,9 @@ export function getFirebase() {
     return initializeApp({
       credential: applicationDefault(),
       databaseURL: process.env.FS_DATABASE_URL,
+      databaseAuthVariableOverride: {
+        uid: 'svc-worker',
+      },
     });
   }
 }

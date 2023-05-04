@@ -5,6 +5,7 @@
 # credentials
 *.env
 secret
+.config*
 
 # Logs
 logs
