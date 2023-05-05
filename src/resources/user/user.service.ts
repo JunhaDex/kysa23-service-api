@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import {
+import type {
   Message,
   User,
   UserAuth,
   UserCredential,
 } from '@/resources/user/entities/user.entity';
-import { getFirebase } from '@/providers/firebase.provider';
+import type { Page } from '@/types/general.type';
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { getDatabase } from 'firebase-admin/database';
-import { Page } from '@/types/general.type';
+import { getStorage } from 'firebase-admin/storage';
+import { getFirebase } from '@/providers/firebase.provider';
+import sharp from 'sharp';
 
 const DOC_NAME_USER = 'user';
 const DOC_NAME_INBOX = 'inbox';
@@ -17,21 +20,42 @@ const DOC_NAME_MATCH = 'match';
 @Injectable()
 export class UserService {
   private readonly db;
+  private readonly bucket;
+  private readonly jwt;
 
-  constructor() {
+  constructor(jwtSvc: JwtService) {
     const app = getFirebase();
     this.db = getDatabase(app);
+    this.bucket = getStorage().bucket();
+    this.jwt = jwtSvc;
   }
 
   async update(id: string, user: User): Promise<boolean> {
     const doc = this.db.ref(DOC_NAME_USER);
-    const key = btoa(user.email);
-    const instance = await doc.child(key).once('value');
+    const instance = await doc.child(id).once('value');
     if (instance.val()) {
       const updateUser = instance.val();
       updateUser.image = user.image;
       updateUser.bio = user.bio;
-      await doc.child(key).set(updateUser);
+      await doc.child(id).set(updateUser);
+      return true;
+    }
+    return false;
+  }
+
+  async updateImage(id: string, file: any) {
+    const doc = this.db.ref(DOC_NAME_USER);
+    const instance = await doc.child(id).once('value');
+    if (instance.val()) {
+      // resize
+      const buffer = await sharp(file.buffer)
+        .resize({ width: 550, height: 550 })
+        .jpeg({
+          quality: 85,
+        })
+        .toBuffer();
+      // upload
+      await this.bucket.file('foo/test.jpg').save(buffer);
       return true;
     }
     return false;
@@ -52,8 +76,11 @@ export class UserService {
     if (instance.val()) {
       const user = instance.val();
       if (user.password === cred.password) {
-        // TODO: get jwt token, check is first (has bio or image)
-        return {} as UserAuth;
+        const payload = { uid: user.uid, name: user.name, dob: user.dob };
+        const accessToken = await this.jwt.signAsync(payload);
+        // TODO: update FCM
+        const isFirst = !(user.image || user.bio);
+        return { token: accessToken, isFirst } as UserAuth;
       }
       throw new UserError(403, 'Password Incorrect');
     }

@@ -6,7 +6,11 @@ import { RegisterModule } from '@/resources/register/register.module';
 import { UserModule } from '@/resources/user/user.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), RegisterModule, UserModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    RegisterModule,
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -9,10 +9,16 @@ import {
   HttpStatus,
   HttpException,
   Req,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  UsePipes,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, UserCredential } from '@/resources/user/entities/user.entity';
 import { okMessage } from '@/utils/index.util';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileSizeValidationPipe } from '@/utils/file.pipe';
 
 @Controller('user')
 export class UserController {
@@ -29,6 +35,21 @@ export class UserController {
   async update(@Req() req: any, @Body() userInfo: User) {
     const uid = req.uid;
     if (await this.userService.update(uid, userInfo)) {
+      return okMessage;
+    } else {
+      throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
+    }
+  }
+
+  @Post('my/image')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateImage(
+    @Req() req: any,
+    @UploadedFile(new FileSizeValidationPipe())
+    file: Express.Multer.File,
+  ) {
+    const uid = req.uid;
+    if (file && (await this.userService.updateImage(uid, file))) {
       return okMessage;
     } else {
       throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
@@ -61,8 +82,17 @@ export class UserController {
    */
   @Post('login')
   login(@Body() credential: UserCredential) {
-    // TODO update FCM, return new auth token
-    return this.userService.login(credential);
+    try {
+      return this.userService.login(credential);
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      } else if (e.code === 404) {
+        throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+      } else {
+        throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   }
 
   /**
