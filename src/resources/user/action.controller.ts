@@ -39,15 +39,9 @@ export class UserActionController {
    * @param options: query options
    */
   @Get('inbox')
-  async userInbox(
-    @Req() req: any,
-    @Query()
-    options?: {
-      page: number;
-    },
-  ) {
+  async userInbox(@Req() req: any) {
     const uid = req.uid;
-    return this.userService.getInbox(uid, options);
+    return this.userService.getInbox(uid);
   }
 
   /**
@@ -58,14 +52,8 @@ export class UserActionController {
    * @param options: query options
    */
   @Get('outbox')
-  async userOutbox(
-    @Req() req: any,
-    @Query()
-    options?: {
-      page: number;
-    },
-  ) {
+  async userOutbox(@Req() req: any) {
     const uid = req.uid;
-    return this.userService.getInbox(uid, options);
+    return this.userService.getOutbox(uid);
   }
 }

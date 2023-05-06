@@ -8,7 +8,7 @@ export function unixNow(): number {
 
 export function getYearBorn(age = 1): number {
   const date = new Date();
-  return date.getFullYear() + (age - 1);
+  return date.getFullYear() - age + 1;
 }
 
 export const okMessage = {

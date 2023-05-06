@@ -52,6 +52,22 @@ GET http://localhost:3000/user/list?name=이
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
 
+### Update User
+PATCH http://localhost:3000/user/my
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0
+
+{
+  "bio": "안녕하세요 이은지 입니다.",
+  "tweet": "한줄 메세지 몇자 제한인가요?",
+  "mbti": "INFJ",
+  "interest": "영화보기",
+  "ageGroup": [
+    20,
+    30
+  ]
+}
+
 ### Upload Image
 POST http://localhost:3000/user/my/image
 Content-Type: multipart/form-data; boundary=boundary
@@ -81,3 +97,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJaWEpzYVc1b
   "recipient": "dmlyZ2luaWEyQGhvdG1haWwuY29t",
   "notify": false
 }
+
+### Get My Inbox
+GET http://localhost:3000/send/inbox
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0
+
+### Get My Outbox
+GET http://localhost:3000/send/outbox
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0

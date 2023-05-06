@@ -131,35 +131,11 @@ export class UserService {
       }
     }
     return {
-      items: pageData,
+      items: pageData.map((usr) => this.cleanInfo(usr)),
       currentPage: 1,
       totalPage: 3,
       count: pageData.length,
     } as Page<User>;
-  }
-
-  private function;
-
-  setQuery(
-    query: any,
-    options?: {
-      geo?: string;
-      name?: string;
-      group?: string;
-    },
-  ): Query {
-    let res = query;
-    const { name, geo, group } = options ?? {};
-    if (name) {
-      res = res.orderByChild('name').startAt(name).endAt(`${name}\uf8ff`);
-    } else if (geo) {
-      res = res.orderByChild('geo').equalTo(geo);
-    } else if (group) {
-      res = res.orderByChild('group').equalTo(group);
-    } else {
-      res = res.orderByKey();
-    }
-    return res;
   }
 
   /**
@@ -168,6 +144,7 @@ export class UserService {
    * @throws 404 User Not Exist
    */
   async getUser(uid: string): Promise<User> {
+    // TODO: 연락처 정보 선택적 클리닝
     const doc = this.db.ref(DOC_NAME_USER);
     const instance = await doc.child(uid).once('value');
     if (instance.val()) {
@@ -176,15 +153,54 @@ export class UserService {
     throw new UserError(404, 'User Not Exist');
   }
 
-  async getInbox(
-    uid: string,
-    query?: { page: number },
-  ): Promise<Page<Message>> {
+  async getInbox(uid: string): Promise<Page<{ user: User; message: Message }>> {
     // default value
-    const page = query ? query.page : 1;
-    const doc = this.db.ref(DOC_NAME_INBOX).ref(uid);
-    // TODO: add conditions
-    return {} as Page<Message>;
+    const messageRef = await this.db
+      .ref(DOC_NAME_INBOX)
+      .child(uid)
+      .onve('value');
+    const myRef = await this.db.ref(DOC_NAME_USER).child(uid).once('value');
+    const messages = messageRef.val();
+    const my = myRef.val();
+    let lists = [];
+    for (const [k, v] of Object.entries(messages)) {
+      const userRef = await this.db.ref(DOC_NAME_USER).child(k).once('value');
+      lists.push({ user: this.cleanInfo(userRef.val()), message: v });
+    }
+    if (my.ageGroup) {
+      lists = lists.filter((fullMsg: { user: User; message: Message }) => {
+        const year = fullMsg.user.dob.split('/')[0];
+        console.log(year, my.ageGroup);
+        return my.ageGroup[1] <= year && my.ageGroup[0] >= year;
+      });
+    }
+    return {
+      items: lists,
+      currentPage: 1,
+      totalPage: 1,
+      count: lists.length,
+    };
+  }
+
+  async getOutbox(
+    uid: string,
+  ): Promise<Page<{ user: User; message: Message }>> {
+    const messageRef = await this.db
+      .ref(DOC_NAME_MATCH)
+      .child(uid)
+      .once('value');
+    const messages = messageRef.val();
+    const lists = [];
+    for (const [k, v] of Object.entries(messages)) {
+      const userRef = await this.db.ref(DOC_NAME_USER).child(k).once('value');
+      lists.push({ user: this.cleanInfo(userRef.val()), message: v });
+    }
+    return {
+      items: lists,
+      currentPage: 1,
+      totalPage: 1,
+      count: lists.length,
+    };
   }
 
   async notifyApp() {
@@ -242,6 +258,40 @@ export class UserService {
       }
     }
     return false;
+  }
+
+  private setQuery(
+    query: any,
+    options?: {
+      geo?: string;
+      name?: string;
+      group?: string;
+    },
+  ): Query {
+    let res = query;
+    const { name, geo, group } = options ?? {};
+    if (name) {
+      res = res.orderByChild('name').startAt(name).endAt(`${name}\uf8ff`);
+    } else if (geo) {
+      res = res.orderByChild('geo').equalTo(geo);
+    } else if (group) {
+      res = res.orderByChild('group').equalTo(group);
+    } else {
+      res = res.orderByKey();
+    }
+    return res;
+  }
+
+  private cleanInfo(user: User, exclude?: string[]) {
+    let deletable = ['contact', 'join', 'password', 'createdAt', 'updatedAt'];
+    const cleaned: User = { ...user };
+    if (exclude) {
+      deletable = deletable.filter((x) => !exclude.includes(x));
+    }
+    for (const key of deletable) {
+      delete cleaned[key];
+    }
+    return cleaned;
   }
 }
 
