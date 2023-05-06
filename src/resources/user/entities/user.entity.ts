@@ -1,6 +1,6 @@
 import { Register } from '@/resources/register/entities/register.entity';
 
-const ActionTypes = {
+export const ActionTypes = {
   Contact: 'contact',
   Match: 'match',
 } as const;
@@ -11,12 +11,17 @@ export interface User extends Register {
   password: string;
   image: string; // Link to file
   bio: string;
+  tweet: string;
+  mbti: string;
+  interest: string;
+  ageGroup: number[]; // tuple of year
 }
 
 export class Message {
   from: string;
-  uid: string;
+  to: string;
   msgType: ActionType;
+  isReveal: boolean;
 }
 
 export interface UserCredential {
