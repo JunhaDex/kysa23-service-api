@@ -1,5 +1,14 @@
-import { Controller, Post, Body, Get, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Req,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { UserService } from './user.service';
+import type { Message } from '@/resources/user/entities/user.entity';
+import { okMessage } from '@/utils/index.util';
 
 @Controller('send')
 export class UserActionController {
@@ -8,11 +17,17 @@ export class UserActionController {
   /**
    * POST /send/match
    * @param req: req.uid sender id
-   * @param rid: recipient id
+   * @param message: recipient id (to) and isReveal
    */
   @Post('match')
-  sendContact(@Req() req: any, @Body('recipientId') rid: string) {
+  async sendContact(@Req() req: any, @Body() message: Message) {
     const sid = req.uid;
-    return this.userService.sendMatch(sid, rid);
+    const { to, isReveal } = message;
+    if (to !== undefined && isReveal !== undefined) {
+      if (await this.userService.sendMatch(sid, to, isReveal)) {
+        return okMessage;
+      }
+    }
+    throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
   }
 }

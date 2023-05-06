@@ -32,7 +32,7 @@ export class UserModule implements NestModule {
       .exclude({ path: '/user/login', method: RequestMethod.POST })
       .forRoutes(
         { path: '/user/*', method: RequestMethod.ALL },
-        { path: '/action/*', method: RequestMethod.ALL },
+        { path: '/send/*', method: RequestMethod.ALL },
       );
   }
 }

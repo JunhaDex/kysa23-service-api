@@ -15,11 +15,9 @@ import { getFirebase } from '@/providers/firebase.provider';
 import sharp from 'sharp';
 import { getYearBorn, PAGE_SIZE, unixNow } from '@/utils/index.util';
 import { ActionTypes } from '@/resources/user/entities/user.entity';
-import { send } from '@sendgrid/mail';
 
 const DOC_NAME_USER = 'user';
 const DOC_NAME_INBOX = 'inbox';
-const DOC_NAME_CONTACT = 'contact';
 const DOC_NAME_MATCH = 'match';
 const BUCKET_USER_PROFILE = 'user/profiles';
 
@@ -201,8 +199,10 @@ export class UserService {
     const doc = this.db.ref(DOC_NAME_USER);
     const inbox = this.db.ref(DOC_NAME_INBOX);
     const match = this.db.ref(DOC_NAME_MATCH);
-    const ss = await doc.child(senderId).once('value');
-    const rr = await doc.child(recipientId).once('value');
+    const [ss, rr] = await Promise.all([
+      doc.child(senderId).once('value'),
+      doc.child(recipientId).once('value'),
+    ]);
     if (ss.val() && rr.val()) {
       const sender = ss.val();
       const recipient = rr.val();
@@ -222,7 +222,7 @@ export class UserService {
           from: senderId,
           to: recipientId,
           msgType,
-          isReveal,
+          isReveal: msgType === ActionTypes.Match ? true : isReveal,
         };
         try {
           await match.child(senderId).child(recipientId).set(message);

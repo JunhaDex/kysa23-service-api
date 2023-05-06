@@ -8,6 +8,8 @@ program
   .option('-sr --sync-register', 'update register sheet in drive')
   .option('-uu --update-user', 'get app users from register')
   .parse(process.argv);
+// TODO: reset daily count
+// TODO: notification
 const options = program.opts();
 if (options.updateUser) {
   createAppUser().then(() => {

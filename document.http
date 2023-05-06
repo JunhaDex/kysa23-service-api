@@ -23,12 +23,17 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL
 }
 
 ### login
+# {
+#   "email": "billy79@naver.com",
+#   "password": "056852",
+#   "fcm": "foo-bar"
+# }
 POST http://localhost:3000/user/login
 Content-Type: application/json
 
 {
-  "email": "billy79@naver.com",
-  "password": "056852",
+  "email": "virginia2@hotmail.com",
+  "password": "184480",
   "fcm": "foo-bar"
 }
 
@@ -52,3 +57,21 @@ Content-Disposition: form-data; name="file"; filename="tester.png"
 
 < ./dump/tester.png
 --boundary
+
+### Send Match
+# ZW5hLmZyaWVzZW40QGtha2FvLmNvbQ== 이미연
+# dmlyZ2luaWEyQGhvdG1haWwuY29t 이은지
+# c2F2YW5uYTUxQGdtYWlsLmNvbQ== 최서연
+# ZXJpYzgyQGdtYWlsLmNvbQ== 힌대정
+# YmlsbHk3OUBuYXZlci5jb20= 강용성
+# ZXJsaW5nMzRAeWFob28uY29t 김병호
+#
+# 강용성 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
+POST http://localhost:3000/send/match
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0
+
+{
+  "to": "ZXJsaW5nMzRAeWFob28uY29t",
+  "isReveal": false
+}
