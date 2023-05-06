@@ -5,10 +5,12 @@ import {
   Req,
   HttpException,
   HttpStatus,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import type { Message } from '@/resources/user/entities/user.entity';
 import { okMessage } from '@/utils/index.util';
+import { MessageDto } from '@/resources/user/dto/message.input';
 
 @Controller('send')
 export class UserActionController {
@@ -20,14 +22,50 @@ export class UserActionController {
    * @param message: recipient id (to) and isReveal
    */
   @Post('match')
-  async sendContact(@Req() req: any, @Body() message: Message) {
+  async sendContact(@Req() req: any, @Body() message: MessageDto) {
     const sid = req.uid;
-    const { to, isReveal } = message;
-    if (to !== undefined && isReveal !== undefined) {
-      if (await this.userService.sendMatch(sid, to, isReveal)) {
-        return okMessage;
-      }
+    const { recipient, notify } = message;
+    if (await this.userService.sendMatch(sid, recipient, notify)) {
+      return okMessage;
     }
     throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
+  }
+
+  /**
+   * GET /user/inbox
+   * update user info
+   * get uid from middleware
+   * @param req: req.uid auth middleware
+   * @param options: query options
+   */
+  @Get('inbox')
+  async userInbox(
+    @Req() req: any,
+    @Query()
+    options?: {
+      page: number;
+    },
+  ) {
+    const uid = req.uid;
+    return this.userService.getInbox(uid, options);
+  }
+
+  /**
+   * GET /user/inbox
+   * update user info
+   * get uid from middleware
+   * @param req: req.uid auth middleware
+   * @param options: query options
+   */
+  @Get('outbox')
+  async userOutbox(
+    @Req() req: any,
+    @Query()
+    options?: {
+      page: number;
+    },
+  ) {
+    const uid = req.uid;
+    return this.userService.getInbox(uid, options);
   }
 }

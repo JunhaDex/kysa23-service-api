@@ -59,7 +59,7 @@ export class UserService {
     if (instance.val()) {
       // resize
       const buffer = await sharp(file.buffer)
-        .resize({ width: 550, height: 550 })
+        .resize({ width: 550, height: 550 }) //TODO: 이미지 사이즈 확인
         .jpeg({
           quality: 85,
         })

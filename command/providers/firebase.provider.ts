@@ -1,4 +1,4 @@
-import { getApp, initializeApp } from 'firebase-admin/app';
+import { initializeApp } from 'firebase-admin/app';
 import { credential } from 'firebase-admin';
 import cred from '../.config.json';
 import * as path from 'path';

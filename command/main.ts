@@ -8,8 +8,8 @@ program
   .option('-sr --sync-register', 'update register sheet in drive')
   .option('-uu --update-user', 'get app users from register')
   .parse(process.argv);
-// TODO: reset daily count
-// TODO: notification
+// TODO: 일일 선택권 초기화
+// TODO: 모바일 알림
 const options = program.opts();
 if (options.updateUser) {
   createAppUser().then(() => {

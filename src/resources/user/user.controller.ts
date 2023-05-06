@@ -57,25 +57,6 @@ export class UserController {
   }
 
   /**
-   * GET /user/inbox
-   * update user info
-   * get uid from middleware
-   * @param req: req.uid auth middleware
-   * @param options: query options
-   */
-  @Get('inbox')
-  async userInbox(
-    @Req() req: any,
-    @Query()
-    options?: {
-      page: number;
-    },
-  ) {
-    const uid = req.uid;
-    return this.userService.getInbox(uid, options);
-  }
-
-  /**
    * POST /user/login
    * check ID, PW and update FCM
    * @Param credential: User ID, PWD, FCM
@@ -120,6 +101,8 @@ export class UserController {
    */
   @Get(':id')
   async findOne(@Param('id') id: string) {
+    // TODO: 연락처 공개 여부 (나를알림 이거나 매칭성공 일 때)
+    // TODO: 관심표현 가능 여부 (동성인 경우)
     return this.userService.getUser(id);
   }
 }

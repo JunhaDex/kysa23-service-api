@@ -28,12 +28,17 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL
 #   "password": "056852",
 #   "fcm": "foo-bar"
 # }
+# {
+#   "email": "virginia2@hotmail.com",
+#   "password": "184480",
+#   "fcm": "foo-bar"
+# }
 POST http://localhost:3000/user/login
 Content-Type: application/json
 
 {
-  "email": "virginia2@hotmail.com",
-  "password": "184480",
+  "email": "erling34@yahoo.com",
+  "password": "380820",
   "fcm": "foo-bar"
 }
 
@@ -67,11 +72,12 @@ Content-Disposition: form-data; name="file"; filename="tester.png"
 # ZXJsaW5nMzRAeWFob28uY29t 김병호
 #
 # 강용성 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
+# 이은지 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0
 POST http://localhost:3000/send/match
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJaWEpzYVc1bk16UkFlV0ZvYjI4dVkyOXQiLCJuYW1lIjoi6rmA67OR7Zi4IiwiZG9iIjoiMTk5MS8xMC8wNiIsImlhdCI6MTY4MzM3MDY4OX0.BDsL0xuN2N41ANAHbyEC9LjKlrQDg3Vnuq6NTuLxCZY
 
 {
-  "to": "ZXJsaW5nMzRAeWFob28uY29t",
-  "isReveal": false
+  "recipient": "dmlyZ2luaWEyQGhvdG1haWwuY29t",
+  "notify": false
 }

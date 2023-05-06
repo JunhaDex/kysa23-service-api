@@ -29,6 +29,7 @@ export async function createAppUser() {
     console.log(atob(reg.uid), user.password);
   });
   await docUser.set(userRes);
+  //TODO: 이메일 발송
 }
 
 function getSixDigits(): string {
