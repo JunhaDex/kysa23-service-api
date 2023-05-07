@@ -1,0 +1,5 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'gcr.io/kysa23-project/kysa23-service-api', '-f', './build/gcp/Dockerfile', '.' ]
+images:
+  - 'gcr.io/kysa23-project/kysa23-service-api'

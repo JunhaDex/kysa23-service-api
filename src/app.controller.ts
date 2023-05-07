@@ -8,31 +8,8 @@ import { getAuth } from 'firebase-admin/auth';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
+  @Get('healthz')
+  healthCheck(): string {
     return this.appService.getHello();
-  }
-
-  @Get('/temp')
-  async getToken(): Promise<string> {
-    const app = getFirebase();
-    const auth = getAuth(app);
-    const uid = 'foo-bar';
-    return await auth.createCustomToken(uid);
-  }
-
-  @Post('/send')
-  async sendMessage(): Promise<string> {
-    const mailer = sgMail;
-    mailer.setApiKey(process.env.SENDGRID_API_KEY);
-    const msg = {
-      to: '',
-      from: '',
-      subject: 'Sending with SendGrid is Fun',
-      text: 'and easy to do anywhere, even with Node.js',
-      html: '<strong>and easy to do anywhere, even with Node.js</strong>',
-    };
-    await mailer.send(msg).catch((e) => console.error(e));
-    return 'ok';
   }
 }
