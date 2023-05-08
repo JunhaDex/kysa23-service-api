@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "kysa23-project"
-  }
+  },
+  "targets": {
+    "kysa23-project": {
+      "hosting": {
+        "api": [
+          "kysa23-service"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
