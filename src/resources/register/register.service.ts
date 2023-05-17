@@ -30,4 +30,17 @@ export class RegisterService {
     }
     return false;
   }
+
+  async getCount() {
+    const document = this.db.ref(DB_NAME);
+  }
+}
+
+class RegisterError extends Error {
+  code: number;
+
+  constructor(code: number, message: string) {
+    super(message);
+    this.code = code;
+  }
 }

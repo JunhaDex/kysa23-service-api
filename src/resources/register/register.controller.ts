@@ -1,9 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Post, Body, Logger, Get } from "@nestjs/common";
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
 
@@ -20,8 +15,13 @@ export class RegisterController {
     return this.registerService.create(regInfo);
   }
 
-  @Post('/send')
+  @Post('/send') // with create
   sendMail() {
+    return '';
+  }
+
+  @Get('/stats')
+  getRegCount() {
     return '';
   }
 }
