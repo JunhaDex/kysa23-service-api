@@ -14,3 +14,5 @@ export interface User extends Register {
   image: string; // Link to file
   bio: string;
 }
+
+export type RegisterInput = 'general' | 'sensitive';

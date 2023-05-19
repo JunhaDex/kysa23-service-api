@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { createAppUser } from './functions/user.func';
 import * as process from 'process';
+import { updateSheetInfo } from './functions/register.func';
 
 const program = new Command();
 program
@@ -11,9 +12,14 @@ program
 // TODO: 일일 선택권 초기화
 // TODO: 모바일 알림
 const options = program.opts();
+
+function cb() {
+  console.log('process finished');
+  process.exit(0);
+}
+
 if (options.updateUser) {
-  createAppUser().then(() => {
-    console.log('process finished');
-    process.exit(0);
-  });
+  createAppUser().then(cb);
+} else if (options.syncRegister) {
+  updateSheetInfo().then(cb);
 }
