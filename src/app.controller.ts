@@ -8,7 +8,7 @@ import { getAuth } from 'firebase-admin/auth';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('healthz')
+  @Get('hc')
   healthCheck(): string {
     return this.appService.getHello();
   }
