@@ -11,8 +11,6 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe,
-  UsePipes,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, UserCredential } from '@/resources/user/entities/user.entity';
@@ -26,6 +24,28 @@ export class UserController {
 
   /**
    * GET /user/my
+   * get user info (My own)
+   * get uid from middleware
+   * @param req: req.uid auth middleware
+   */
+  @Get('my')
+  async getOwn(@Req() req: any) {
+    const uid = req.uid;
+    try {
+      return this.userService.getMe(uid);
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      } else if (e.code === 404) {
+        throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+      } else {
+        throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+  }
+
+  /**
+   * PATCH /user/my
    * update user info
    * get uid from middleware
    * @param req: req.uid auth middleware

@@ -17,7 +17,6 @@ export interface Register {
   // 데이터 입출력
   createdAt: number; // unix
   updatedAt: number; // unix
-  canceledAt: number; // unix, 대회 참석 취소
 }
 
 export interface RequiredConsent {

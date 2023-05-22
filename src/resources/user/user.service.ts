@@ -15,6 +15,7 @@ import { getFirebase } from '@/providers/firebase.provider';
 import sharp from 'sharp';
 import { getYearBorn, PAGE_SIZE, unixNow } from '@/utils/index.util';
 import { ActionTypes } from '@/resources/user/entities/user.entity';
+import * as constants from 'constants';
 
 const DOC_NAME_USER = 'user';
 const DOC_NAME_INBOX = 'inbox';
@@ -34,6 +35,15 @@ export class UserService {
     this.jwt = jwtSvc;
   }
 
+  async getMe(uid: string) {
+    const doc = this.db.ref(DOC_NAME_USER);
+    const instance = await doc.child(uid).once('value');
+    if (instance.val()) {
+      return instance.val();
+    }
+    throw new UserError(404, 'User Not Exist');
+  }
+
   async update(id: string, user: User): Promise<boolean> {
     const doc = this.db.ref(DOC_NAME_USER);
     const instance = await doc.child(id).once('value');
@@ -43,10 +53,7 @@ export class UserService {
       updateUser.tweet = user.tweet;
       updateUser.mbti = user.mbti;
       updateUser.interest = user.interest;
-      updateUser.ageGroup = [
-        getYearBorn(user.ageGroup[0]),
-        getYearBorn(user.ageGroup[1]),
-      ];
+      updateUser.ageGroup = [user.ageGroup[0], user.ageGroup[1]];
       await doc.child(id).set(updateUser);
       return true;
     }
@@ -96,8 +103,9 @@ export class UserService {
       const user = instance.val();
       if (user.password === cred.password) {
         const payload = { uid: user.uid, name: user.name, dob: user.dob };
+        user.fcm = cred.fcm;
+        await instance.child(user.uid).update(user);
         const accessToken = await this.jwt.signAsync(payload);
-        // TODO: update FCM
         const isFirst = !(user.image || user.bio);
         return { token: accessToken, isFirst } as UserAuth;
       }
@@ -114,6 +122,7 @@ export class UserService {
   }): Promise<Page<User>> {
     // default value
     const page = query.page ?? 1;
+    let totalPage = 0;
     const doc = this.db.ref(DOC_NAME_USER);
     const last = await this.setQuery(doc, query)
       .limitToFirst(PAGE_SIZE * page)
@@ -121,6 +130,7 @@ export class UserService {
     let pageData = [];
     if (last.val()) {
       const values = Object.values(last.val()) as User[];
+      totalPage = Math.floor(values.length / PAGE_SIZE);
       if (values.length > PAGE_SIZE * (page - 1)) {
         const shift = values.length % PAGE_SIZE;
         if (!shift) {
@@ -132,8 +142,8 @@ export class UserService {
     }
     return {
       items: pageData.map((usr) => this.cleanInfo(usr)),
-      currentPage: 1,
-      totalPage: 3,
+      currentPage: page,
+      totalPage,
       count: pageData.length,
     } as Page<User>;
   }
@@ -144,11 +154,10 @@ export class UserService {
    * @throws 404 User Not Exist
    */
   async getUser(uid: string): Promise<User> {
-    // TODO: 연락처 정보 선택적 클리닝
     const doc = this.db.ref(DOC_NAME_USER);
     const instance = await doc.child(uid).once('value');
     if (instance.val()) {
-      return instance.val();
+      return this.cleanInfo(instance.val(), 'detail');
     }
     throw new UserError(404, 'User Not Exist');
   }
@@ -282,11 +291,29 @@ export class UserService {
     return res;
   }
 
-  private cleanInfo(user: User, exclude?: string[]) {
-    let deletable = ['contact', 'join', 'password', 'createdAt', 'updatedAt'];
+  private cleanInfo(user: User, usage: 'detail' | 'contact' | 'list' = 'list') {
+    const detail = ['contact', 'password', 'fcm'] as const;
+    const contact = ['password', 'fcm'] as const;
+    const list = [
+      'dob',
+      'geo',
+      'contact',
+      'password',
+      'bio',
+      'tweet',
+      'mbti',
+      'fcm',
+      'interest',
+      'ageGroup',
+    ] as const;
+    let deletable: any;
     const cleaned: User = { ...user };
-    if (exclude) {
-      deletable = deletable.filter((x) => !exclude.includes(x));
+    if (usage === 'detail') {
+      deletable = detail;
+    } else if (usage === 'contact') {
+      deletable = contact;
+    } else {
+      deletable = list;
     }
     for (const key of deletable) {
       delete cleaned[key];

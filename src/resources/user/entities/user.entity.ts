@@ -13,6 +13,7 @@ export interface User extends Register {
   bio: string;
   tweet: string;
   mbti: string;
+  fcm: string;
   interest: string;
   ageGroup: number[]; // tuple of year
 }

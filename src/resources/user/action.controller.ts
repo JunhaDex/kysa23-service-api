@@ -45,7 +45,7 @@ export class UserActionController {
   }
 
   /**
-   * GET /user/inbox
+   * GET /user/outbox
    * update user info
    * get uid from middleware
    * @param req: req.uid auth middleware

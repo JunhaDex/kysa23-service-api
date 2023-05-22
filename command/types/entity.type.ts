@@ -13,6 +13,10 @@ export interface User extends Register {
   password: string;
   image: string; // Link to file
   bio: string;
+  tweet: string;
+  mbti: string;
+  interest: string;
+  ageGroup: number[]; // tuple of year
 }
 
 export type RegisterInput = 'general' | 'sensitive';

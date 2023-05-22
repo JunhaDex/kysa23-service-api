@@ -4,6 +4,7 @@ import { Register, User } from '../types/entity.type';
 
 const DOC_NAME_REGISTER = 'test';
 const DOC_NAME_USER = 'user';
+const WHITELISTONLY = ['rlarlfah303@gmail.com', 'kjunha77@gmail.com'];
 
 export async function createAppUser() {
   const app = await getFirebase();
@@ -23,12 +24,19 @@ export async function createAppUser() {
   const userRes = {};
   console.log('User Queue Count: ', userQueue.length);
   userQueue.forEach((reg) => {
-    const user = reg as User;
+    const user = cleanInfo(reg) as User;
     user.password = getSixDigits();
+    // set default value
+    user.image = '';
+    user.bio = '';
+    user.tweet = '';
+    user.mbti = '';
+    user.interest = '';
+    user.ageGroup = [];
     userRes[reg.uid] = user;
     console.log(atob(reg.uid), user.password);
   });
-  await docUser.set(userRes);
+  await docUser.update(userRes);
   //TODO: 이메일 발송
 }
 
@@ -38,4 +46,20 @@ function getSixDigits(): string {
     pwd += Math.floor(Math.random() * 10).toString();
   }
   return pwd;
+}
+
+function cleanInfo(reg: Register): Register {
+  const deletable = [
+    'isMember',
+    'joins',
+    'consent',
+    'checkIn',
+    'updatedAt',
+    'createdAt',
+  ] as const;
+  const cleaned: Register = { ...reg };
+  for (const key of deletable) {
+    delete cleaned[key];
+  }
+  return cleaned;
 }

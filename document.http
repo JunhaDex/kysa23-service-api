@@ -3,17 +3,17 @@ GET http://localhost:3000/temp
 Content-Type: application/json
 
 ### create one
-POST http://localhost:3000/register
+POST https://api.kysa.page/register
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL2lkZW50aXR5dG9vbGtpdC5nb29nbGVhcGlzLmNvbS9nb29nbGUuaWRlbnRpdHkuaWRlbnRpdHl0b29sa2l0LnYxLklkZW50aXR5VG9vbGtpdCIsImlhdCI6MTY4MTgwNjE2OSwiZXhwIjoxNjgxODA5NzY5LCJpc3MiOiJmaXJlYmFzZS1hZG1pbnNkay04MTFpOEBreXNhMjMtcHJvamVjdC5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsInN1YiI6ImZpcmViYXNlLWFkbWluc2RrLTgxMWk4QGt5c2EyMy1wcm9qZWN0LmlhbS5nc2VydmljZWFjY291bnQuY29tIiwidWlkIjoiZm9vLWJhciJ9.dHdiltrW39Gh-othLjnj9-6R__wLU6wjHKi3QjlwUGMzxuDJ59NJqOhjr8KEe6RliZKULn7NUUCz7b3omPjgGBg-YPA_XDZAfTLiNUlY4PhIxJE07Y63-sxcrcgrkcD1UJ8hJdG-5ybiQ3H3HnfHFEQa_bVuoZcmGP3BaQ62SgqVpHl4rDnDa887Ia2Nr8Wuj2lfD2L-E4ubYrJ1ue2KBsM9AsMwKsPVxsH90Jx-1v0SJyFGpndgq80Bt6h6qL80NttGZVzbriJb-ZyO0ztg2JMtHw-VkdmFWKOucS9Fi4JQxCcS0mupU4weg75jm-pq0Ce14J4KgVDtj93nDwgCxw
 
 {
-  "email": "virginia2@hotmail.com",
-  "name": "이은지",
-  "dob": "2001/09/16",
+  "email": "kjunha77@gmail.com",
+  "name": "김준하",
+  "dob": "1993/02/15",
   "sex": "f",
-  "contact": "010-9565-3646",
-  "geo": "string",
+  "contact": "010-5849-5378",
+  "geo": "경기 수지와드",
   "isMember": true,
   "joins": [
     25,
@@ -33,12 +33,12 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL
 #   "password": "184480",
 #   "fcm": "foo-bar"
 # }
-POST http://localhost:3000/user/login
+POST https://api.kysa.page/user/login
 Content-Type: application/json
 
 {
-  "email": "erling34@yahoo.com",
-  "password": "380820",
+  "email": "rlarlfah303@gmail.com",
+  "password": "388200",
   "fcm": "foo-bar"
 }
 
@@ -48,14 +48,14 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
 
 ### Get User List
-GET http://localhost:3000/user/list?name=이
+GET https://api.kysa.page/user/list
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJjbXhoY214bVlXZ3pNRE5BWjIxaGFXd3VZMjl0IiwibmFtZSI6Iuq5gOq4uOuqqCIsImRvYiI6IjE5OTIvMDMvMTciLCJpYXQiOjE2ODQ1NjM2MTR9.W9TsOYFdxvsmBkf5aweN_PlqUGgv3tQmu-5mneuG190
 
 ### Update User
-PATCH http://localhost:3000/user/my
+PATCH https://api.kysa.page/user/my
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
 
 {
   "bio": "안녕하세요 이은지 입니다.",
@@ -69,14 +69,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsd
 }
 
 ### Upload Image
-POST http://localhost:3000/user/my/image
+POST https://api.kysa.page/user/my/image
 Content-Type: multipart/form-data; boundary=boundary
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
 
 --boundary
-Content-Disposition: form-data; name="file"; filename="tester.png"
+Content-Disposition: form-data; name="file"; filename="tester.jpeg"
 
-< ./dump/tester.png
+< ./dump/tester-v.jpeg
 --boundary
 
 ### Send Match
