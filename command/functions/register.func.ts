@@ -3,6 +3,7 @@ import { getFirebase } from '../providers/firebase.provider';
 import { getDatabase } from 'firebase-admin/database';
 
 const DOC_NAME_REGISTER = 'test';
+const fromFormKor = 'reg_data_kor';
 
 export async function updateSheetInfo() {
   // get unregistered register info from DB

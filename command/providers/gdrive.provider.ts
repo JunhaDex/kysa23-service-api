@@ -37,3 +37,10 @@ export async function appendSheet(rows: any[][], type: RegisterInput) {
     requestBody: { values: rows },
   });
 }
+
+export async function getForm(rowNum: number) {
+  const sheet = await bootstrap();
+  const result = await sheet.spreadsheets.values.get({
+
+  })
+}
