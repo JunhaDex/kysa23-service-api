@@ -86,6 +86,7 @@ export class UserController {
     try {
       return this.userService.login(credential);
     } catch (e) {
+      console.log(e.code);
       if (e.code === 403) {
         throw new HttpException(e.message, HttpStatus.FORBIDDEN);
       } else if (e.code === 404) {

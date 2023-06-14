@@ -103,8 +103,9 @@ export class UserService {
       const user = instance.val();
       if (user.password === cred.password) {
         const payload = { uid: user.uid, name: user.name, dob: user.dob };
-        user.fcm = cred.fcm;
-        await instance.child(user.uid).update(user);
+        console.log('login succeed: ', JSON.stringify(payload));
+        // user.fcm = cred.fcm;
+        // await instance.child(user.uid).update(user);
         const accessToken = await this.jwt.signAsync(payload);
         const isFirst = !(user.image || user.bio);
         return { token: accessToken, isFirst } as UserAuth;
