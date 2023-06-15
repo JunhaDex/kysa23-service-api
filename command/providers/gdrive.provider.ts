@@ -38,9 +38,11 @@ export async function appendSheet(rows: any[][], type: RegisterInput) {
   });
 }
 
-export async function getForm(rowNum: number) {
+export async function getForm(rowNum: number, lang: 'kor' | 'eng' = 'kor') {
   const sheet = await bootstrap();
   const result = await sheet.spreadsheets.values.get({
-
-  })
+    spreadsheetId: cred.formId,
+    range: `reg_data_${lang}!A${rowNum}:K${rowNum + 100}`,
+  });
+  return result.data.values ?? [];
 }

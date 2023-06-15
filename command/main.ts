@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { createAppUser } from './functions/user.func';
 import * as process from 'process';
-import { updateSheetInfo } from './functions/register.func';
+import { pullFormData, updateSheetInfo } from './functions/register.func';
 import { sendGroupEmail } from './functions/email.func';
 import * as dotenv from 'dotenv';
 
@@ -26,7 +26,7 @@ function cb() {
 if (options.updateUser) {
   createAppUser().then(cb);
 } else if (options.syncRegister) {
-  updateSheetInfo().then(cb);
+  pullFormData().then(cb);
 } else if (options.sendEmail) {
   sendGroupEmail().then(cb);
 }
