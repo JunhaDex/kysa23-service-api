@@ -46,3 +46,17 @@ export async function getForm(rowNum: number, lang: 'kor' | 'eng' = 'kor') {
   });
   return result.data.values ?? [];
 }
+
+export async function markCopy(
+  rowNum: number,
+  lang: 'kor' | 'eng' = 'kor',
+  rows: any[][],
+) {
+  const sheet = await bootstrap();
+  await sheet.spreadsheets.values.append({
+    spreadsheetId: cred.formId,
+    range: `reg_data_${lang}!K${rowNum}:K${rowNum + 100}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: rows },
+  });
+}

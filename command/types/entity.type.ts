@@ -7,6 +7,7 @@ export interface Register {
   contact: string;
   geo: string;
   isMember: boolean;
+  createdAt: number; // unix
 }
 
 export interface User extends Register {

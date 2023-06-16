@@ -1,10 +1,17 @@
-import { appendSheet, getForm, getSheet } from '../providers/gdrive.provider';
+import {
+  appendSheet,
+  getForm,
+  getSheet,
+  markCopy,
+} from '../providers/gdrive.provider';
 import { getFirebase } from '../providers/firebase.provider';
 import { getDatabase } from 'firebase-admin/database';
 import { Register } from '../types/entity.type';
+import { unixNow } from '../../src/utils/index.util';
+import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-const DOC_NAME_REGISTER = 'test';
+const DOC_NAME_REGISTER = 'prev';
 const FORM_ORDER = [
   'name',
   'email',
@@ -16,14 +23,46 @@ const FORM_ORDER = [
   'joins',
   'consent',
 ] as const;
+const COMMON_MAILER = [
+  'gmail.com',
+  'naver.com',
+  'hanmail.net',
+  'hotmail.com',
+  'kakao.com',
+  'nate.com',
+  'churchofjesuschrist.org',
+] as const;
 
 export async function pullFormData() {
   const ROWNUM = 2; // min = 2
-  const formData = (await getForm(ROWNUM)).filter((row: any[]) => !!row[0]);
-  // console.log(formData);
+  const LANG: 'kor' | 'eng' = 'kor';
+  const formData = (await getForm(ROWNUM, LANG)).filter(
+    (row: any[]) => !!row[0],
+  );
+  let mCount = 0;
+  for (const row of formData) {
+    const email = row[1];
+    const mailer = email.split('@')[1];
+    if (mailer.length && !COMMON_MAILER.includes(mailer)) {
+      console.log(chalk.yellow('WARNING: uncommon mailer detected: '), email);
+      mCount++;
+    }
+  }
+  const ans = await inquirer.prompt([
+    {
+      name: 'continue',
+      message: `${mCount} mails are uncommon. Press "Y" to continue?`,
+    },
+  ]);
+  if (ans.continue.toLowerCase() !== 'y') {
+    console.log(chalk.red('PROCESS CANCELED'));
+    throw new Error('Process Canceled');
+  }
   const app = await getFirebase();
   const db = getDatabase(app);
   const regDoc = db.ref(DOC_NAME_REGISTER);
+  const copied: string[][] = [];
+  const sheetData: any[][] = [];
   for (const row of formData) {
     //cleaning
     const key = btoa(row[1]);
@@ -36,68 +75,59 @@ export async function pullFormData() {
     FORM_ORDER.map((value, i) => {
       register[value] = row[i];
     });
-    console.log(register);
     register.uid = key;
     const reg = await regDoc.child(key).once('value');
-    if (!reg.val()) {
-      //update
-    } else {
-      console.log('WARNING: Email Duplication: ', JSON.stringify(register));
-    }
+    const regRow = updateSheetInfo(register);
+    sheetData.push(regRow);
+    // if (!reg.val()) {
+    //   //update
+    //   const current = unixNow();
+    //   register.createdAt = current;
+    //   await regDoc.child(key).set(register);
+    //   copied.push([current.toString()]);
+    //   console.log(
+    //     `Register Created: id: ${register.uid}, name: ${register.name}, email: ${register.email}`,
+    //   );
+    //   const regRow = updateSheetInfo(register);
+    //   sheetData.push(regRow);
+    // } else {
+    //   console.log(
+    //     chalk.bgRed('DANGER: Email Duplication: ', JSON.stringify(register)),
+    //   );
+    //   copied.push(['']);
+    // }
   }
+  // await markCopy(ROWNUM, LANG, copied);
+  await appendSheet(sheetData, 'general');
+  console.log(chalk.blue('INFO: Process Finished!'));
 }
 
-export async function updateSheetInfo() {
-  // get unregistered register info from DB
-  let recentReg = 0;
-  const latest = (await getSheet('general')).pop();
-  if (latest) {
-    recentReg = Number(latest[8]);
-  }
-  const app = await getFirebase();
-  const db = getDatabase(app);
-  const docReg = db.ref(DOC_NAME_REGISTER);
-  console.log(`Recent timestamp: ${recentReg}`);
-  const newbie = await docReg
-    .orderByChild('createdAt')
-    .startAfter(recentReg)
-    .once('value');
+export function updateSheetInfo(register: Register) {
   const columnOrder = [
     'name',
     'uid',
     'dob',
     'geo',
     'sex',
+    'email',
     'contact',
     'joins',
-    'createdAt',
+    'consent',
     'createdAt',
   ] as const;
-  const sheetData: any[][] = [];
-
-  // format sheet data
-  console.log(!!newbie.val() ? 'Newbie Found 🎉' : 'Register Up To Date 😎');
-  if (newbie.val()) {
-    const list = Object.values(newbie.val());
-    console.log(`Updating ${list.length} rows...`);
-    for (const reg of list) {
-      const row = [];
-      columnOrder.forEach((key) => {
-        const cell = reg[key];
-        if (typeof cell === 'object') {
-          row.push(cell.join(', '));
-        } else if (typeof cell === 'number') {
-          row.push(cell.toString());
-        } else {
-          row.push(cell);
-        }
-      });
-      row.push('온라인');
-      sheetData.push(row);
+  const row = [];
+  columnOrder.forEach((key) => {
+    const cell = register[key];
+    if (typeof cell === 'object') {
+      row.push(cell.join(', '));
+    } else if (typeof cell === 'number') {
+      row.push(cell.toString());
+    } else if (cell === undefined) {
+      row.push('');
+    } else {
+      row.push(cell);
     }
-    // sync data
-    await appendSheet(sheetData, 'general');
-    console.log('Data Upload Completed! 🚀');
-  }
-  console.log('[[[ End of Process ]]]');
+  });
+  row.push('온라인');
+  return row;
 }
