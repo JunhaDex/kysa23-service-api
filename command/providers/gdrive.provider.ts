@@ -17,9 +17,10 @@ export async function bootstrap() {
   return google.sheets({ version: 'v4', auth: authorize });
 }
 
-export async function getSheet(type: RegisterInput) {
+export async function getSheet(rowNum: number) {
   const sheet = await bootstrap();
-  const range = type === 'general' ? GENERAL_RANGE : SENSITIVE_RANGE;
+  // const range = `general!C${rowNum}:T${rowNum + 100}`;
+  const range = `general!C${rowNum}:T${rowNum}`;
   const result = await sheet.spreadsheets.values.get({
     spreadsheetId: cred.sheetId,
     range,
@@ -27,9 +28,9 @@ export async function getSheet(type: RegisterInput) {
   return result.data.values ?? [];
 }
 
-export async function appendSheet(rows: any[][], type: RegisterInput) {
+export async function appendSheet(rowNum: number, rows: any[][]) {
   const sheet = await bootstrap();
-  const range = type === 'general' ? GENERAL_RANGE : SENSITIVE_RANGE;
+  const range = `general!C${rowNum}`;
   await sheet.spreadsheets.values.append({
     spreadsheetId: cred.sheetId,
     range,

@@ -1,7 +1,6 @@
 import {
   appendSheet,
   getForm,
-  getSheet,
   markCopy,
 } from '../providers/gdrive.provider';
 import { getFirebase } from '../providers/firebase.provider';
@@ -11,7 +10,7 @@ import { unixNow } from '../../src/utils/index.util';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 
-const DOC_NAME_REGISTER = 'prev';
+const DOC_NAME_REGISTER = 'register';
 const FORM_ORDER = [
   'name',
   'email',
@@ -34,7 +33,8 @@ const COMMON_MAILER = [
 ] as const;
 
 export async function pullFormData() {
-  const ROWNUM = 2; // min = 2
+  const ROWNUM = 103; // min = 2
+  const REGIDX = 98;
   const LANG: 'kor' | 'eng' = 'kor';
   const formData = (await getForm(ROWNUM, LANG)).filter(
     (row: any[]) => !!row[0],
@@ -66,9 +66,13 @@ export async function pullFormData() {
   for (const row of formData) {
     //cleaning
     const key = btoa(row[1]);
+    row[4] = row[4].length < 5 ? '' : row[4];
     row[5] = row[5].replace('와드', '').replace('지부', '');
     row[6] = row[6] === 'TRUE';
-    row[7] = row[7].split(',').map((day: string) => Number(day));
+    row[7] = row[7]
+      .split(',')
+      .map((day: string) => Number(day))
+      .filter((x) => x > 0);
     row[8] = Number(row[8]);
     //encapsulation
     const register = {} as Register;
@@ -77,28 +81,26 @@ export async function pullFormData() {
     });
     register.uid = key;
     const reg = await regDoc.child(key).once('value');
-    const regRow = updateSheetInfo(register);
-    sheetData.push(regRow);
-    // if (!reg.val()) {
-    //   //update
-    //   const current = unixNow();
-    //   register.createdAt = current;
-    //   await regDoc.child(key).set(register);
-    //   copied.push([current.toString()]);
-    //   console.log(
-    //     `Register Created: id: ${register.uid}, name: ${register.name}, email: ${register.email}`,
-    //   );
-    //   const regRow = updateSheetInfo(register);
-    //   sheetData.push(regRow);
-    // } else {
-    //   console.log(
-    //     chalk.bgRed('DANGER: Email Duplication: ', JSON.stringify(register)),
-    //   );
-    //   copied.push(['']);
-    // }
+    if (!reg.val()) {
+      //update
+      const current = unixNow();
+      register.createdAt = current;
+      await regDoc.child(key).set(register);
+      copied.push([current.toString()]);
+      console.log(
+        `Register Created: id: ${register.uid}, name: ${register.name}, email: ${register.email}`,
+      );
+      const regRow = updateSheetInfo(register);
+      sheetData.push(regRow);
+    } else {
+      console.log(
+        chalk.bgRed('DANGER: Email Duplication: ', JSON.stringify(register)),
+      );
+      copied.push(['']);
+    }
   }
-  // await markCopy(ROWNUM, LANG, copied);
-  await appendSheet(sheetData, 'general');
+  await markCopy(ROWNUM, LANG, copied);
+  await appendSheet(REGIDX + 14, sheetData);
   console.log(chalk.blue('INFO: Process Finished!'));
 }
 
