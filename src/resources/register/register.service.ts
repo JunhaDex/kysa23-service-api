@@ -4,7 +4,7 @@ import { getDatabase } from 'firebase-admin/database';
 import { unixNow } from '@/utils/index.util';
 import { getFirebase } from '@/providers/firebase.provider';
 
-const DB_NAME = 'test';
+const DB_NAME = 'register';
 
 @Injectable()
 export class RegisterService {
@@ -32,7 +32,8 @@ export class RegisterService {
   }
 
   async getCount() {
-    const document = this.db.ref(DB_NAME);
+    const document = await this.db.ref(DB_NAME).once('value');
+    return { count: Object.keys(document.val()).length };
   }
 }
 

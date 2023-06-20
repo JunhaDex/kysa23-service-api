@@ -107,3 +107,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsd
 GET http://localhost:3000/send/outbox
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJkbWx5WjJsdWFXRXlRR2h2ZEcxaGFXd3VZMjl0IiwibmFtZSI6IuydtOydgOyngCIsImRvYiI6IjIwMDEvMDkvMTYiLCJpYXQiOjE2ODMzNjg5ODN9.9_jYoo6UM-Nv3LBsmDPRQ-JlA_v0dqzbgAJfil5A_D0
+
+### Get Register Count
+GET http://localhost:3000/register/stats

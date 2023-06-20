@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Logger, Get } from "@nestjs/common";
+import { Controller, Post, Body, Logger, Get } from '@nestjs/common';
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
 
@@ -21,7 +21,7 @@ export class RegisterController {
   }
 
   @Get('/stats')
-  getRegCount() {
-    return '';
+  async getRegCount() {
+    return await this.registerService.getCount();
   }
 }
