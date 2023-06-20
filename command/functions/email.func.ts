@@ -1,9 +1,14 @@
 import * as fs from 'fs';
 import sgMail from '@sendgrid/mail';
-import { getSheet } from '../providers/gdrive.provider';
+import {
+  getCoupon,
+  getSheet,
+  updateTimestamp,
+} from '../providers/gdrive.provider';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import * as process from 'process';
+import { unixNow } from '@/utils/index.util';
 
 const priceTag = `
 <div class="price-tag-bg bg-blue">
@@ -41,16 +46,21 @@ export async function sendGroupEmail() {
   const formData = (await getSheet(REGIDX + 14)).filter(
     (row: any[]) => !!row[0],
   );
+  const couponData = (await getCoupon(REGIDX + 2))
+    .filter((row: any[]) => !!row[0])
+    .map((row: string[]) => row[0]);
   const ans = await inquirer.prompt([
     {
       name: 'continue',
-      message: `got ${formData.length} emails. Press "Y" to continue?`,
+      message: `got ${formData.length} emails. and ${couponData.length} coupons. Press "Y" to continue?`,
     },
   ]);
   if (ans.continue.toLowerCase() !== 'y') {
     console.log(chalk.red('PROCESS CANCELED'));
     throw new Error('Process Canceled');
   }
+  const timestamps: string[][] = [];
+  let index = 0;
   for (const row of formData) {
     row[7] = row[7].split(',').map((day: string) => Number(day));
     row[8] = row[8];
@@ -59,6 +69,7 @@ export async function sendGroupEmail() {
       user_name: row[0],
       user_phone: row[6] ?? '-',
       user_joins: `8월 ${row[7].join(', ')}일 (총 ${row[7].length}일)`,
+      coupon_code: couponData[index],
     };
     let template = fs.readFileSync('./command/templates/welcome.html', {
       encoding: 'utf8',
@@ -66,10 +77,9 @@ export async function sendGroupEmail() {
     for (const key of Object.keys(obj)) {
       template = template.replace(`<%${key}%>`, obj[key]);
     }
-    const price = priceTag.replace('<%price%>', row[888]);
     template = template.replace(
       '<%price_tag%>',
-      obj.user_joins.length === 3 ? specialTag : price,
+      row[7].length === 3 ? specialTag : priceTag.replace('<%price%>', row[12]),
     );
     const msg = {
       to: obj.recipient,
@@ -77,12 +87,18 @@ export async function sendGroupEmail() {
       subject: '[2023 KYSA] 전국 청년대회에 등록해 주셔서 감사합니다.',
       html: template,
     };
+    const current = unixNow(); // msg sent time
     try {
       const result = await sgMail.send(msg);
       console.log(result[0].statusCode);
     } catch (e) {
       console.error(e);
+      timestamps.push(['']);
+      await updateTimestamp(REGIDX + 14, REGIDX + 2, timestamps);
       throw new Error('Email Failed');
     }
+    timestamps.push([current.toString()]);
+    index++;
   }
+  await updateTimestamp(REGIDX + 14, REGIDX + 2, timestamps);
 }
