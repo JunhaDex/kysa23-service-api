@@ -1,9 +1,8 @@
 import { google } from 'googleapis';
 import cred from '../.config.json';
 import path from 'path';
-import { RegisterInput } from '../types/entity.type';
 
-const BULK_VOLUME = 0;
+const BULK_VOLUME = 100;
 
 export async function bootstrap() {
   const secPath = path.join(process.cwd(), cred.fbAdmin);
@@ -78,7 +77,7 @@ export async function getForm(rowNum: number, lang: 'kor' | 'eng' = 'kor') {
   const sheet = await bootstrap();
   const result = await sheet.spreadsheets.values.get({
     spreadsheetId: cred.formId,
-    range: `reg_data_${lang}!A${rowNum}:K${rowNum + 100}`,
+    range: `reg_data_${lang}!A${rowNum}:K${rowNum + BULK_VOLUME}`,
   });
   return result.data.values ?? [];
 }
@@ -91,7 +90,7 @@ export async function markCopy(
   const sheet = await bootstrap();
   await sheet.spreadsheets.values.append({
     spreadsheetId: cred.formId,
-    range: `reg_data_${lang}!K${rowNum}:K${rowNum + 100}`,
+    range: `reg_data_${lang}!K${rowNum}:K${rowNum + BULK_VOLUME}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: rows },
   });

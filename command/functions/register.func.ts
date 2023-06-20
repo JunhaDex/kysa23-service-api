@@ -1,8 +1,4 @@
-import {
-  appendSheet,
-  getForm,
-  markCopy,
-} from '../providers/gdrive.provider';
+import { appendSheet, getForm, markCopy } from '../providers/gdrive.provider';
 import { getFirebase } from '../providers/firebase.provider';
 import { getDatabase } from 'firebase-admin/database';
 import { Register } from '../types/entity.type';
@@ -33,8 +29,8 @@ const COMMON_MAILER = [
 ] as const;
 
 export async function pullFormData() {
-  const ROWNUM = 103; // min = 2
-  const REGIDX = 98;
+  const ROWNUM = 104; // min = 2
+  const REGIDX = 99;
   const LANG: 'kor' | 'eng' = 'kor';
   const formData = (await getForm(ROWNUM, LANG)).filter(
     (row: any[]) => !!row[0],
@@ -66,7 +62,7 @@ export async function pullFormData() {
   for (const row of formData) {
     //cleaning
     const key = btoa(row[1]);
-    row[4] = row[4].length < 5 ? '' : row[4];
+    row[4] = row[4].length < 5 ? '' : row[4].replace(/[^0-9]/g, '');
     row[5] = row[5].replace('와드', '').replace('지부', '');
     row[6] = row[6] === 'TRUE';
     row[7] = row[7]
