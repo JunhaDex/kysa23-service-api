@@ -9,6 +9,7 @@ async function bootstrap() {
   process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(process.cwd(), secret);
   path.join(process.cwd(), secret);
   const app = await NestFactory.create(AppModule);
+  app.enableCors({ origin: ['http://localhost:8080', 'https://kysa.page/'] });
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
