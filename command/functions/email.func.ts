@@ -42,8 +42,8 @@ const specialTag = `
 export async function sendGroupEmail() {
   console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  const REGIDX = 0;
-  const formData = (await getSheet(REGIDX + 14)).filter(
+  const REGIDX = 2;
+  const formData = (await getSheet(REGIDX + 13)).filter(
     (row: any[]) => !!row[0],
   );
   const couponData = (await getCoupon(REGIDX + 2))
@@ -90,9 +90,16 @@ export async function sendGroupEmail() {
     const current = unixNow(); // msg sent time
     try {
       const result = await sgMail.send(msg);
-      console.log(result[0].statusCode);
+      if (result[0].statusCode < 299) {
+        console.log(`Email sent to: ${obj.recipient} (${obj.user_name})`);
+      } else {
+        console.log(
+          chalk.bgRed('DANGER: Error Code Uncommon: ', JSON.stringify(obj)),
+        );
+      }
     } catch (e) {
-      console.error(e);
+      chalk.bgRed(`ERROR: Send Failed(${e.code}): `, JSON.stringify(obj));
+      console.error(JSON.stringify(e));
       timestamps.push(['']);
       await updateTimestamp(REGIDX + 14, REGIDX + 2, timestamps);
       throw new Error('Email Failed');
