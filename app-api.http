@@ -1,0 +1,63 @@
+# DalDal App Api Full Test
+# [[[ Login / Sign-up ]]]
+
+### Login
+# Request:
+# - email (string): 로그인 하는 계정
+# - password (string): 비밀번호, 숫자 6자리: 이메일 확인
+# - fcm (string): 기기 고유정보
+# Response:
+# token (string): JWT 토큰 (기기저장용)
+# isFirst (boolean): 첫 로그인 여부 (가입정보 미등록 유저)
+# 첫 로그인 false: 가입화면 노출, 첫 로그인 true: 바로 리스트화면 노출
+
+POST https://api.kysa.page/user/login
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": "",
+  "fcm": "foo-bar"
+}
+
+### Update User
+# Response:
+# message (string): "ok"
+# 에러가 없으면 성공 (200 일 시)
+
+PATCH https://api.kysa.page/user/my
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "bio": "안녕하세요 이은지 입니다.",
+  "tweet": "한줄 메세지 몇자 제한인가요?",
+  "mbti": "INFJ",
+  "interest": "영화보기",
+  "ageGroup": [
+    20,
+    30
+  ]
+}
+
+### Update User Profile
+# Response:
+# message (string): "ok"
+# 에러가 없으면 성공 (200 일 시)
+
+POST https://api.kysa.page/user/my/image
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: Bearer
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="tester.jpeg"
+
+< ./dump/tester.png
+--boundary
+
+# [[[ 조회 (전체, 개별, 나) ]]]
+
+
+
+
+

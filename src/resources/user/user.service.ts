@@ -7,15 +7,19 @@ import type {
 } from '@/resources/user/entities/user.entity';
 import type { Page } from '@/types/general.type';
 import type { Query } from 'firebase-admin/database';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { getDatabase } from 'firebase-admin/database';
 import { getStorage } from 'firebase-admin/storage';
 import { getFirebase } from '@/providers/firebase.provider';
 import sharp from 'sharp';
-import { getYearBorn, PAGE_SIZE, unixNow } from '@/utils/index.util';
+import {
+  getJsonLog,
+  getYearBorn,
+  PAGE_SIZE,
+  unixNow,
+} from '@/utils/index.util';
 import { ActionTypes } from '@/resources/user/entities/user.entity';
-import * as constants from 'constants';
 
 const DOC_NAME_USER = 'user';
 const DOC_NAME_INBOX = 'inbox';
@@ -27,12 +31,14 @@ export class UserService {
   private readonly db;
   private readonly bucket;
   private readonly jwt;
+  private readonly logger;
 
   constructor(jwtSvc: JwtService) {
     const app = getFirebase();
     this.db = getDatabase(app);
     this.bucket = getStorage().bucket();
     this.jwt = jwtSvc;
+    this.logger = new Logger(UserService.name);
   }
 
   async getMe(uid: string) {
@@ -103,7 +109,7 @@ export class UserService {
       const user = instance.val();
       if (user.password === cred.password) {
         const payload = { uid: user.uid, name: user.name, dob: user.dob };
-        console.log('login succeed: ', JSON.stringify(payload));
+        this.logger.log(`Logged in: ${getJsonLog(payload)}`);
         // user.fcm = cred.fcm;
         // await instance.child(user.uid).update(user);
         const accessToken = await this.jwt.signAsync(payload);

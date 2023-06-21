@@ -40,9 +40,9 @@ const specialTag = `
   </div>`;
 
 export async function sendGroupEmail() {
+  const REGIDX = 169;
   console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-  const REGIDX = 2;
   const formData = (await getSheet(REGIDX + 13)).filter(
     (row: any[]) => !!row[0],
   );
@@ -98,7 +98,9 @@ export async function sendGroupEmail() {
         );
       }
     } catch (e) {
-      chalk.bgRed(`ERROR: Send Failed(${e.code}): `, JSON.stringify(obj));
+      console.log(
+        chalk.bgRed(`ERROR: Send Failed(${e.code}): `, JSON.stringify(obj)),
+      );
       console.error(JSON.stringify(e));
       timestamps.push(['']);
       await updateTimestamp(REGIDX + 14, REGIDX + 2, timestamps);

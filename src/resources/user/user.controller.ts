@@ -11,6 +11,7 @@ import {
   Req,
   UseInterceptors,
   UploadedFile,
+  Logger,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, UserCredential } from '@/resources/user/entities/user.entity';
@@ -20,7 +21,11 @@ import { FileSizeValidationPipe } from '@/utils/file.pipe';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  private readonly logger;
+
+  constructor(private readonly userService: UserService) {
+    this.logger = new Logger(UserController.name);
+  }
 
   /**
    * GET /user/my
@@ -55,8 +60,12 @@ export class UserController {
   async update(@Req() req: any, @Body() userInfo: User) {
     const uid = req.uid;
     if (await this.userService.update(uid, userInfo)) {
+      this.logger.log(`user: ${req.uid} ${atob(req.uid)} / patch my done`);
       return okMessage;
     } else {
+      this.logger.error(
+        `user: ${req.uid} ${atob(req.uid)} / patch my not found`,
+      );
       throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
     }
   }
@@ -82,11 +91,13 @@ export class UserController {
    * @Param credential: User ID, PWD, FCM
    */
   @Post('login')
-  login(@Body() credential: UserCredential) {
+  async login(@Body() credential: UserCredential) {
     try {
-      return this.userService.login(credential);
+      return await this.userService.login(credential);
     } catch (e) {
-      console.log(e.code);
+      this.logger.error(
+        `user: ${credential.email} ${credential.password} / login: ${e.code} ${e.message}`,
+      );
       if (e.code === 403) {
         throw new HttpException(e.message, HttpStatus.FORBIDDEN);
       } else if (e.code === 404) {

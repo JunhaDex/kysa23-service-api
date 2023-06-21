@@ -24,3 +24,15 @@ export function accessDenied(res: any, url: string) {
   };
   return res.status(403).json(response);
 }
+
+export function getJsonLog(obj: any): string {
+  const keys = Object.keys(obj);
+  let log = '';
+  for (const key of keys) {
+    log += `${key}: ${obj[key]}, `;
+  }
+  if (log.length) {
+    log = log.slice(0, -2);
+  }
+  return log;
+}
