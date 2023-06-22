@@ -36,3 +36,26 @@ export function getJsonLog(obj: any): string {
   }
   return log;
 }
+
+export function paginate(
+  list: any[],
+  page: number,
+  pageSize: number,
+  option: any,
+): { count: number; list: any[] } {
+  const pgn = { count: 0, list };
+  for (const key of Object.keys(option)) {
+    if (key !== 'page' && option[key]) {
+      pgn.list = pgn.list.filter((item) => item[key].includes(option[key]));
+    }
+  }
+  pgn.count = pgn.list.length;
+  if (pgn.list.length > pageSize) {
+    pgn.list = pgn.list.slice((page - 1) * pageSize, page * pageSize);
+  } else {
+    if (page > 1) {
+      pgn.list = [];
+    }
+  }
+  return pgn;
+}

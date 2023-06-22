@@ -1,6 +1,7 @@
 import type {
   ActionType,
   Message,
+  RelationType,
   User,
   UserAuth,
   UserCredential,
@@ -17,11 +18,16 @@ import {
   getJsonLog,
   getYearBorn,
   PAGE_SIZE,
+  paginate,
   unixNow,
 } from '@/utils/index.util';
-import { ActionTypes } from '@/resources/user/entities/user.entity';
+import {
+  ActionTypes,
+  RelationTypes,
+} from '@/resources/user/entities/user.entity';
 
 const DOC_NAME_USER = 'user';
+const DOC_NAME_COUNTER = 'counter';
 const DOC_NAME_INBOX = 'inbox';
 const DOC_NAME_MATCH = 'match';
 const BUCKET_USER_PROFILE = 'user/profiles';
@@ -121,35 +127,33 @@ export class UserService {
     throw new UserError(404, 'User Not Exist');
   }
 
-  async getList(query?: {
-    page: number;
-    geo?: string;
-    name?: string;
-    group?: string;
-  }): Promise<Page<User>> {
+  async getList(
+    uid: string,
+    query?: {
+      page: number;
+      geo?: string;
+      name?: string;
+      group?: string;
+    },
+  ): Promise<Page<User>> {
     // default value
-    const page = query.page ?? 1;
-    let totalPage = 0;
+    const page = query.page && query.page > 0 ? query.page : 1;
     const doc = this.db.ref(DOC_NAME_USER);
-    const last = await this.setQuery(doc, query)
-      .limitToFirst(PAGE_SIZE * page)
-      .once('value');
-    let pageData = [];
-    if (last.val()) {
-      const values = Object.values(last.val()) as User[];
-      totalPage = Math.floor(values.length / PAGE_SIZE);
-      if (values.length > PAGE_SIZE * (page - 1)) {
-        const shift = values.length % PAGE_SIZE;
-        if (!shift) {
-          pageData = values.slice(PAGE_SIZE * -1);
-        } else {
-          pageData = values.slice(shift * -1);
-        }
-      }
+    const me = await this.checkToken(uid);
+    const oppo = me.sex === 'm' ? 'f' : 'm';
+    // orderByChild('group')
+    const res = await doc.orderByChild('sex').equalTo(oppo).once('value');
+    const pageData = [];
+    let totalPage = 0;
+    if (res.val()) {
+      const total = Object.values(res.val()) as User[];
+      const userList = paginate(total, page, PAGE_SIZE, query);
+      totalPage = Math.ceil(userList.count / PAGE_SIZE);
+      pageData.push(...userList.list);
     }
     return {
       items: pageData.map((usr) => this.cleanInfo(usr)),
-      currentPage: page,
+      currentPage: Number(page),
       totalPage,
       count: pageData.length,
     } as Page<User>;
@@ -157,14 +161,23 @@ export class UserService {
 
   /**
    * get single user instance
-   * @param uid
+   * @param myId: my uid
+   * @param reqId: target search id
    * @throws 404 User Not Exist
    */
-  async getUser(uid: string): Promise<User> {
+  async getUser(
+    myId: string,
+    reqId: string,
+  ): Promise<{ self: User; data: User; relation: RelationType }> {
     const doc = this.db.ref(DOC_NAME_USER);
-    const instance = await doc.child(uid).once('value');
+    const me = await this.checkToken(myId);
+    const instance = await doc.child(reqId).once('value');
     if (instance.val()) {
-      return this.cleanInfo(instance.val(), 'detail');
+      return {
+        self: me,
+        data: this.cleanInfo(instance.val(), 'detail'),
+        relation: RelationTypes.None,
+      };
     }
     throw new UserError(404, 'User Not Exist');
   }
@@ -229,8 +242,16 @@ export class UserService {
     isReveal: boolean,
   ): Promise<boolean> {
     const doc = this.db.ref(DOC_NAME_USER);
+    const counter = this.db.ref(DOC_NAME_COUNTER);
     const inbox = this.db.ref(DOC_NAME_INBOX);
     const match = this.db.ref(DOC_NAME_MATCH);
+    const me = await this.checkToken(senderId);
+    this.logger.log(
+      `send match request :::: sender:${senderId} (cnt:${me.count}), receiver:${recipientId}, reveal:${isReveal}`,
+    );
+    if (me.count <= 0) {
+      throw new UserError(403, 'No More Request');
+    }
     const [ss, rr] = await Promise.all([
       doc.child(senderId).once('value'),
       doc.child(recipientId).once('value'),
@@ -267,13 +288,49 @@ export class UserService {
               inbox.child(recipientId).child(senderId).set(message);
             }
           }
-          return true;
+          this.logger.log(
+            `send match request succeed :::: sender:${senderId}, receiver:${recipientId}, reveal:${isReveal}`,
+          );
         } catch (e) {
+          this.logger.error(
+            `send match request failed :::: sender:${senderId}, receiver:${recipientId}, reveal:${isReveal}`,
+          );
           return false;
         }
+        counter
+          .child(senderId)
+          .update({ count: me.count - 1 })
+          .then(() => {
+            this.logger.log(
+              `send match request callback :::: sender:${senderId} (cnt:${me.count})`,
+            );
+          })
+          .catch(() => {
+            this.logger.warn(
+              `send match request callback failed :::: sender:${senderId}`,
+            );
+          });
+        return true;
       }
     }
     return false;
+  }
+
+  private async checkToken(uid: string): Promise<User> {
+    const users = this.db.ref(DOC_NAME_USER);
+    const me = await users.child(uid).once('value');
+    if (me.val()) {
+      const count = await this.db
+        .ref(DOC_NAME_COUNTER)
+        .child(uid)
+        .once('value');
+      const self = this.cleanInfo(me.val());
+      self.count = count.val() ? 0 : count.val().count;
+      return self as User;
+    } else {
+      this.logger.warning(`${uid} => invalid uid access`);
+      throw new UserError(401, 'Invalid User');
+    }
   }
 
   private setQuery(

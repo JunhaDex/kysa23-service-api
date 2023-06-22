@@ -25,8 +25,16 @@ export class UserActionController {
   async sendContact(@Req() req: any, @Body() message: MessageDto) {
     const sid = req.uid;
     const { recipient, notify } = message;
-    if (await this.userService.sendMatch(sid, recipient, notify)) {
-      return okMessage;
+    try {
+      if (await this.userService.sendMatch(sid, recipient, notify)) {
+        return okMessage;
+      }
+    } catch (e) {
+      if (e.code === 401) {
+        throw new HttpException(e.message, HttpStatus.UNAUTHORIZED);
+      } else {
+        throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
     throw new HttpException('Unauthorized', HttpStatus.FORBIDDEN);
   }
@@ -55,5 +63,10 @@ export class UserActionController {
   async userOutbox(@Req() req: any) {
     const uid = req.uid;
     return this.userService.getOutbox(uid);
+  }
+
+  @Get('count')
+  async countSystem() {
+    //TODO:
   }
 }

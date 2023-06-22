@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { createAppUser } from './functions/user.func';
+import { createAppUser, setDailyCount } from './functions/user.func';
 import * as process from 'process';
 import { pullFormData, updateSheetInfo } from './functions/register.func';
 import { sendGroupEmail } from './functions/email.func';
@@ -12,6 +12,7 @@ program
   .version('1.0.0')
   .option('-sr --sync-register', 'update register sheet in drive')
   .option('-uu --update-user', 'get app users from register')
+  .option('-rc --reset-count', 'reset daily count')
   .option('-se --send-email', 'send group email')
   .parse(process.argv);
 // TODO: 일일 선택권 초기화
@@ -29,4 +30,6 @@ if (options.updateUser) {
   pullFormData().then(cb);
 } else if (options.sendEmail) {
   sendGroupEmail().then(cb);
+} else if (options.resetCount) {
+  setDailyCount().then(cb);
 }

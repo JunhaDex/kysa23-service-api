@@ -6,6 +6,8 @@ import chalk from 'chalk';
 
 const DOC_NAME_REGISTER = 'register';
 const DOC_NAME_USER = 'user';
+const DOC_NAME_COUNTER = 'counter';
+const DAILY_COUNT = 10;
 const WHITELISTONLY = ['rlarlfah303@gmail.com', 'kjunha77@gmail.com'];
 
 export async function createAppUser() {
@@ -55,6 +57,19 @@ export async function createAppUser() {
   });
   await docUser.update(userRes);
   //TODO: 이메일 발송
+}
+
+export async function setDailyCount() {
+  const app = await getFirebase();
+  const db = getDatabase(app);
+  const docUser = await db.ref(DOC_NAME_USER).once('value');
+  const dailyCount = {};
+  if (docUser.val()) {
+    for (const uid of Object.keys(docUser.val())) {
+      dailyCount[uid] = { count: DAILY_COUNT };
+    }
+  }
+  await db.ref(DOC_NAME_COUNTER).update(dailyCount);
 }
 
 function getSixDigits(): string {

@@ -7,6 +7,14 @@ export const ActionTypes = {
 
 export type ActionType = (typeof ActionTypes)[keyof typeof ActionTypes];
 
+export const RelationTypes = {
+  None: 'none',
+  Revealed: 'revealed',
+  Matched: 'matched',
+};
+
+export type RelationType = (typeof RelationTypes)[keyof typeof RelationTypes];
+
 export interface User extends Register {
   password: string;
   image: string; // Link to file
@@ -16,6 +24,7 @@ export interface User extends Register {
   fcm: string;
   interest: string;
   ageGroup: number[]; // tuple of year
+  count?: number;
 }
 
 export class Message {

@@ -55,9 +55,66 @@ Content-Disposition: form-data; name="file"; filename="tester.jpeg"
 < ./dump/tester.png
 --boundary
 
-# [[[ 조회 (전체, 개별, 나) ]]]
+# [[[ 조회 (전체, 개별, 나, 전송 건수) ]]]
+
+### User List
+# Query:
+# page: 현재 (요청) 페이지
+# geo: 지역별 필터
+# name: 이름 필터 (검색)
+# group: 조 필터 (기본정렬)
+# Response:
+# items (User[]): 유저 목록
+# currentPage: 현재 페이지
+# totalPage: 전체 페이지 수
+# count: 페이지 아이템 수
+# >> 유저 목록 정책 <<
+# * Bearer 의 유저정보 기준으로 반대성별의 유저만 보여줌
+# * 조별, 지역별 검색 기능
+
+GET https://api.kysa.page/user/list?page=2
+Content-Type: application/json
+Authorization: Bearer
+
+### User Detail
+# Response:
+# self: 내 정보
+# * self.count: 오늘 남은 내 일일 이용권 개수
+# data: 상대방 정보
+# relation: 상대방과 관계
+# * none: 아무 상호작용 없음
+# * revealed: 나를 알림
+# * matched: 매치 성사
+GET https://api.kysa.page/user/Z2tzdG1mdHRAbmF2ZXIuY29t
+#GET http://localhost:3000/user/Z2tzdG1mdHRAbmF2ZXIuY29t
+Content-Type: application/json
+Authorization: Bearer
 
 
+### My Detail
+# Response:
+# 내 정보 -> 수정은 Update User Profile 참조
+GET https://api.kysa.page/user/my
+Content-Type: application/json
+Authorization: Bearer
 
+### GET System Count
 
+# [[[ 액션 (상대방에게 나를 알리기, 나를 숨기고 관심 표현하기) ]]]
+
+### Send Match
+# Request:
+# recipient(string): 상대방 uid
+# notify(boolean): 공개여부
+POST http://localhost:3000/send/match
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "recipient": "dmlyZ2luaWEyQGhvdG1haWwuY29t",
+  "notify": false
+}
+
+###
+# [[[로그 (나의 Outbox(내가 선택한사람), 나의 Inbox(나를 선택한사람))]]]
 

@@ -39,10 +39,13 @@ export class UserController {
     try {
       return this.userService.getMe(uid);
     } catch (e) {
+      this.logger.error(`get user my: ${e.code} ${e.message}`);
       if (e.code === 403) {
         throw new HttpException(e.message, HttpStatus.FORBIDDEN);
       } else if (e.code === 404) {
         throw new HttpException(e.message, HttpStatus.NOT_FOUND);
+      } else if (e.code === 401) {
+        throw new HttpException(e.message, HttpStatus.UNAUTHORIZED);
       } else {
         throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
       }
@@ -111,10 +114,12 @@ export class UserController {
   /**
    * Get /user/list
    * Filter by group
-   * @Params options: query options
+   * @param req: req.uid auth middleware
+   * @param options: query options
    */
   @Get('list')
   async findAll(
+    @Req() req: any,
     @Query()
     options?: {
       page: number;
@@ -123,18 +128,18 @@ export class UserController {
       group?: string;
     },
   ) {
-    return this.userService.getList(options);
+    const uid = req.uid;
+    return this.userService.getList(uid, options);
   }
 
   /**
    * GET user/:id
    * get single user record
+   * @param req: req.uid auth middleware
    * @param id
    */
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    // TODO: 연락처 공개 여부 (나를알림 이거나 매칭성공 일 때)
-    // TODO: 관심표현 가능 여부 (동성인 경우)
-    return this.userService.getUser(id);
+  async findOne(@Req() req: any, @Param('id') id: string) {
+    return this.userService.getUser(req.uid, id);
   }
 }
