@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Get,
   Query,
+  Logger,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { okMessage } from '@/utils/index.util';
@@ -14,7 +15,11 @@ import { MessageDto } from '@/resources/user/dto/message.input';
 
 @Controller('send')
 export class UserActionController {
-  constructor(private readonly userService: UserService) {}
+  private readonly logger;
+
+  constructor(private readonly userService: UserService) {
+    this.logger = new Logger(UserActionController.name);
+  }
 
   /**
    * POST /send/match
@@ -47,9 +52,15 @@ export class UserActionController {
    * @param options: query options
    */
   @Get('inbox')
-  async userInbox(@Req() req: any) {
+  async userInbox(
+    @Req() req: any,
+    @Query()
+    options?: {
+      page: number;
+    },
+  ) {
     const uid = req.uid;
-    return this.userService.getInbox(uid);
+    return this.userService.getInbox(uid, options);
   }
 
   /**
@@ -60,9 +71,15 @@ export class UserActionController {
    * @param options: query options
    */
   @Get('outbox')
-  async userOutbox(@Req() req: any) {
+  async userOutbox(
+    @Req() req: any,
+    @Query()
+    options?: {
+      page: number;
+    },
+  ) {
     const uid = req.uid;
-    return this.userService.getOutbox(uid);
+    return this.userService.getOutbox(uid, options);
   }
 
   @Get('count')

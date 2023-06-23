@@ -41,12 +41,14 @@ export function paginate(
   list: any[],
   page: number,
   pageSize: number,
-  option: any,
+  option?: any,
 ): { count: number; list: any[] } {
   const pgn = { count: 0, list };
-  for (const key of Object.keys(option)) {
-    if (key !== 'page' && option[key]) {
-      pgn.list = pgn.list.filter((item) => item[key].includes(option[key]));
+  if (option) {
+    for (const key of Object.keys(option)) {
+      if (key !== 'page' && option[key]) {
+        pgn.list = pgn.list.filter((item) => item[key].includes(option[key]));
+      }
     }
   }
   pgn.count = pgn.list.length;

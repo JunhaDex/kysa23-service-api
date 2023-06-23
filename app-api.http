@@ -72,7 +72,8 @@ Content-Disposition: form-data; name="file"; filename="tester.jpeg"
 # * Bearer 의 유저정보 기준으로 반대성별의 유저만 보여줌
 # * 조별, 지역별 검색 기능
 
-GET https://api.kysa.page/user/list?page=2
+GET https://api.kysa.page/user/list?geo=경기&page=1
+#GET http://localhost:3000/user/list?geo=경기&page=1
 Content-Type: application/json
 Authorization: Bearer
 
@@ -94,7 +95,8 @@ Authorization: Bearer
 ### My Detail
 # Response:
 # 내 정보 -> 수정은 Update User Profile 참조
-GET https://api.kysa.page/user/my
+#GET https://api.kysa.page/user/my
+GET http://localhost:3000/user/my
 Content-Type: application/json
 Authorization: Bearer
 
@@ -111,10 +113,20 @@ Content-Type: application/json
 Authorization: Bearer
 
 {
-  "recipient": "dmlyZ2luaWEyQGhvdG1haWwuY29t",
-  "notify": false
+  "recipient": "a2p1bmhhNzdAZ21haWwuY29t",
+  "notify": true
 }
 
 ###
 # [[[로그 (나의 Outbox(내가 선택한사람), 나의 Inbox(나를 선택한사람))]]]
+
+### My Outbox
+GET http://localhost:3000/send/outbox?page=1
+Content-Type: application/json
+Authorization: Bearer
+
+### My Inbox
+GET http://localhost:3000/send/inbox
+Content-Type: application/json
+Authorization: Bearer
 

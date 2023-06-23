@@ -137,7 +137,7 @@ export class UserService {
     },
   ): Promise<Page<User>> {
     // default value
-    const page = query.page && query.page > 0 ? query.page : 1;
+    const page = query ? (query.page && query.page > 0 ? query.page : 1) : 1;
     const doc = this.db.ref(DOC_NAME_USER);
     const me = await this.checkToken(uid);
     const oppo = me.sex === 'm' ? 'f' : 'm';
@@ -182,52 +182,69 @@ export class UserService {
     throw new UserError(404, 'User Not Exist');
   }
 
-  async getInbox(uid: string): Promise<Page<{ user: User; message: Message }>> {
-    // default value
-    const messageRef = await this.db
-      .ref(DOC_NAME_INBOX)
-      .child(uid)
-      .onve('value');
-    const myRef = await this.db.ref(DOC_NAME_USER).child(uid).once('value');
-    const messages = messageRef.val();
-    const my = myRef.val();
+  async getInbox(
+    uid: string,
+    query?: {
+      page?: number;
+    },
+  ): Promise<Page<{ user: User; message: Message }>> {
+    const me = await this.checkToken(uid);
+    const page = query ? (query.page && query.page > 0 ? query.page : 1) : 1;
+    const msgRef = await this.db.ref(DOC_NAME_INBOX).child(uid).once('value');
+    const messages = [
+      ...(msgRef.val() ? Object.entries(msgRef.val()).reverse() : []),
+    ];
     let lists = [];
-    for (const [k, v] of Object.entries(messages)) {
+    for (const [k, v] of messages) {
       const userRef = await this.db.ref(DOC_NAME_USER).child(k).once('value');
       lists.push({ user: this.cleanInfo(userRef.val()), message: v });
     }
-    if (my.ageGroup) {
+    if (me.ageGroup) {
       lists = lists.filter((fullMsg: { user: User; message: Message }) => {
-        const year = fullMsg.user.dob.split('/')[0];
-        console.log(year, my.ageGroup);
-        return my.ageGroup[1] <= year && my.ageGroup[0] >= year;
+        const year = Number(fullMsg.user.dob.split('/')[0]);
+        return (
+          getYearBorn(me.ageGroup[1]) <= year &&
+          getYearBorn(me.ageGroup[0]) >= year
+        );
       });
     }
+    const paged = paginate(lists, page, PAGE_SIZE);
+    const totalPage = Math.ceil(paged.count / PAGE_SIZE);
     return {
-      items: lists,
-      currentPage: 1,
-      totalPage: 1,
-      count: lists.length,
+      items: paged.list,
+      currentPage: Number(page),
+      totalPage,
+      count: paged.list.length,
     };
   }
 
   async getOutbox(
     uid: string,
+    query?: {
+      page?: number;
+    },
   ): Promise<Page<{ user: User; message: Message }>> {
-    const messageRef = await this.db
+    await this.checkToken(uid);
+    const page = query ? (query.page && query.page > 0 ? query.page : 1) : 1;
+    const msgRef = await this.db
       .ref(DOC_NAME_MATCH)
       .child(uid)
+      .orderByChild('msgType')
       .once('value');
-    const messages = messageRef.val();
+    const messages = [
+      ...(msgRef.val() ? Object.entries(msgRef.val()).reverse() : []),
+    ];
+    const paged = paginate(messages, page, PAGE_SIZE);
+    const totalPage = Math.ceil(paged.count / PAGE_SIZE);
     const lists = [];
-    for (const [k, v] of Object.entries(messages)) {
+    for (const [k, v] of paged.list) {
       const userRef = await this.db.ref(DOC_NAME_USER).child(k).once('value');
       lists.push({ user: this.cleanInfo(userRef.val()), message: v });
     }
     return {
       items: lists,
-      currentPage: 1,
-      totalPage: 1,
+      currentPage: Number(page),
+      totalPage,
       count: lists.length,
     };
   }
@@ -271,21 +288,39 @@ export class UserService {
         const msgType: ActionType = hasMatch.val()
           ? ActionTypes.Match
           : ActionTypes.Contact;
-        const message: Message = {
-          from: senderId,
-          to: recipientId,
-          msgType,
-          isReveal: msgType === ActionTypes.Match ? true : isReveal,
+        const message = (sid: string, rid: string): Message => {
+          return {
+            from: sid,
+            to: rid,
+            msgType,
+            isReveal: msgType === ActionTypes.Match ? true : isReveal,
+          };
         };
         try {
-          await match.child(senderId).child(recipientId).set(message);
+          await match
+            .child(senderId)
+            .child(recipientId)
+            .set(message(senderId, recipientId));
           if (msgType === ActionTypes.Match) {
-            await match.child(recipientId).child(senderId).set(message);
-            inbox.child(recipientId).child(senderId).set(message);
-            inbox.child(senderId).child(recipientId).set(message);
+            await match
+              .child(recipientId)
+              .child(senderId)
+              .set(message(recipientId, senderId));
+            inbox
+              .child(recipientId)
+              .child(senderId)
+              .set(message(senderId, recipientId));
+            inbox
+              .child(senderId)
+              .child(recipientId)
+              .set(message(recipientId, senderId));
+            this.logger.log('matched!');
           } else {
             if (isReveal) {
-              inbox.child(recipientId).child(senderId).set(message);
+              inbox
+                .child(recipientId)
+                .child(senderId)
+                .set(message(senderId, recipientId));
             }
           }
           this.logger.log(
@@ -299,7 +334,7 @@ export class UserService {
         }
         counter
           .child(senderId)
-          .update({ count: me.count - 1 })
+          .update({ count: --me.count })
           .then(() => {
             this.logger.log(
               `send match request callback :::: sender:${senderId} (cnt:${me.count})`,
@@ -325,7 +360,8 @@ export class UserService {
         .child(uid)
         .once('value');
       const self = this.cleanInfo(me.val());
-      self.count = count.val() ? 0 : count.val().count;
+      self.count = count.val() ? count.val().count : 0;
+      self.ageGroup = me.val().ageGroup;
       return self as User;
     } else {
       this.logger.warning(`${uid} => invalid uid access`);
@@ -359,7 +395,6 @@ export class UserService {
     const detail = ['contact', 'password', 'fcm'] as const;
     const contact = ['password', 'fcm'] as const;
     const list = [
-      'dob',
       'geo',
       'contact',
       'password',
