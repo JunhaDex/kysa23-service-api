@@ -7,8 +7,7 @@ import type {
   UserCredential,
 } from '@/resources/user/entities/user.entity';
 import type { Page } from '@/types/general.type';
-import type { Query } from 'firebase-admin/database';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { getDatabase } from 'firebase-admin/database';
 import { getStorage } from 'firebase-admin/storage';
@@ -25,13 +24,17 @@ import {
   ActionTypes,
   RelationTypes,
 } from '@/resources/user/entities/user.entity';
-import { UserDto } from '@/resources/user/dto/message.input';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 const DOC_NAME_USER = 'user';
 const DOC_NAME_COUNTER = 'counter';
 const DOC_NAME_INBOX = 'inbox';
 const DOC_NAME_MATCH = 'match';
+const REG_COUNT_CACHE_KEY = 'rCnt';
+const MATCH_COUNT_CACHE_KEY = 'mCnt';
 const BUCKET_USER_PROFILE = 'user/profiles';
+const ADK = 'a2p1bmhhNzdAZ21haWwuY29t';
 
 @Injectable()
 export class UserService {
@@ -40,7 +43,10 @@ export class UserService {
   private readonly jwt;
   private readonly logger;
 
-  constructor(jwtSvc: JwtService) {
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    jwtSvc: JwtService,
+  ) {
     const app = getFirebase();
     this.db = getDatabase(app);
     this.bucket = getStorage().bucket();
@@ -152,12 +158,42 @@ export class UserService {
       totalPage = Math.ceil(userList.count / PAGE_SIZE);
       pageData.push(...userList.list);
     }
+    this.updateSystemCount().catch((e) => {
+      this.logger.warn(`Cache Update Failed :::: ${e.message}`);
+    });
     return {
       items: pageData.map((usr) => this.cleanInfo(usr)),
       currentPage: Number(page),
       totalPage,
       count: pageData.length,
     } as Page<User>;
+  }
+
+  async getSystemCount() {
+    const request = (await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0;
+    const match = (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0;
+    return { request, match };
+  }
+
+  async pushSystemCache(uid: string, rCnt: number, mCnt: number) {
+    if (uid === ADK) {
+      await this.cacheManager.set(REG_COUNT_CACHE_KEY, rCnt, 0);
+      await this.cacheManager.set(MATCH_COUNT_CACHE_KEY, mCnt, 0);
+    }
+  }
+
+  // TODO: real-time update match cache & doc on each match count
+  private async updateSystemCount() {
+    const outBoxes = await this.db.ref(DOC_NAME_MATCH).once('value');
+    const matches = await this.db
+      .ref(DOC_NAME_COUNTER)
+      .child('matches')
+      .once('value');
+    await this.pushSystemCache(
+      ADK,
+      Object.keys(outBoxes.val()).length,
+      Number(matches.val() ?? 0),
+    );
   }
 
   /**
@@ -389,28 +425,6 @@ export class UserService {
       this.logger.warning(`${uid} => invalid uid access`);
       throw new UserError(401, 'Invalid User');
     }
-  }
-
-  private setQuery(
-    query: any,
-    options?: {
-      geo?: string;
-      name?: string;
-      group?: string;
-    },
-  ): Query {
-    let res = query;
-    const { name, geo, group } = options ?? {};
-    if (name) {
-      res = res.orderByChild('name').startAt(name).endAt(`${name}\uf8ff`);
-    } else if (geo) {
-      res = res.orderByChild('geo').equalTo(geo);
-    } else if (group) {
-      res = res.orderByChild('group').equalTo(group);
-    } else {
-      res = res.orderByKey();
-    }
-    return res;
   }
 
   private cleanInfo(user: User, usage: 'detail' | 'contact' | 'list' = 'list') {

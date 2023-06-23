@@ -8,6 +8,7 @@ import {
   Get,
   Query,
   Logger,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { okMessage } from '@/utils/index.util';
@@ -84,6 +85,19 @@ export class UserActionController {
 
   @Get('count')
   async countSystem() {
-    //TODO:
+    return await this.userService.getSystemCount();
+  }
+
+  @Patch('count')
+  async setSystem(
+    @Req() res: any,
+    @Body() caches: { request: number; match: number },
+  ) {
+    await this.userService.pushSystemCache(
+      res.uid,
+      caches.request,
+      caches.match,
+    );
+    return okMessage;
   }
 }
