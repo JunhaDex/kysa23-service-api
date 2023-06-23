@@ -18,6 +18,7 @@ import { User, UserCredential } from '@/resources/user/entities/user.entity';
 import { okMessage } from '@/utils/index.util';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '@/utils/file.pipe';
+import { UserDto } from "@/resources/user/dto/message.input";
 
 @Controller('user')
 export class UserController {
@@ -60,9 +61,9 @@ export class UserController {
    * @param userInfo: user info to update
    */
   @Patch('my')
-  async update(@Req() req: any, @Body() userInfo: User) {
+  async update(@Req() req: any, @Body() userInfo: UserDto) {
     const uid = req.uid;
-    if (await this.userService.update(uid, userInfo)) {
+    if (await this.userService.update(uid, userInfo as User)) {
       this.logger.log(`user: ${req.uid} ${atob(req.uid)} / patch my done`);
       return okMessage;
     } else {

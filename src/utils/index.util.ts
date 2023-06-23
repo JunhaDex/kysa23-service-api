@@ -52,6 +52,11 @@ export function paginate(
     }
   }
   pgn.count = pgn.list.length;
+  pgn.list.sort((a, b) => {
+    const an = Number(a.group.substring(1));
+    const bn = Number(b.group.substring(1));
+    return an - bn;
+  });
   if (pgn.list.length > pageSize) {
     pgn.list = pgn.list.slice((page - 1) * pageSize, page * pageSize);
   } else {

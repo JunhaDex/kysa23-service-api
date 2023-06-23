@@ -25,6 +25,7 @@ import {
   ActionTypes,
   RelationTypes,
 } from '@/resources/user/entities/user.entity';
+import { UserDto } from '@/resources/user/dto/message.input';
 
 const DOC_NAME_USER = 'user';
 const DOC_NAME_COUNTER = 'counter';
@@ -61,10 +62,10 @@ export class UserService {
     const instance = await doc.child(id).once('value');
     if (instance.val()) {
       const updateUser = instance.val();
-      updateUser.bio = user.bio;
-      updateUser.tweet = user.tweet;
-      updateUser.mbti = user.mbti;
-      updateUser.interest = user.interest;
+      updateUser.bio = user.bio ?? '';
+      updateUser.tweet = user.tweet ?? '';
+      updateUser.mbti = user.mbti ?? '';
+      updateUser.interest = user.interest ?? '';
       updateUser.ageGroup = [user.ageGroup[0], user.ageGroup[1]];
       await doc.child(id).set(updateUser);
       return true;

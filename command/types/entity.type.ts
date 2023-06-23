@@ -11,6 +11,7 @@ export interface Register {
 }
 
 export interface User extends Register {
+  group?: string; // TODO: Remove Temp Entity
   password: string;
   image: string; // Link to file
   bio: string;

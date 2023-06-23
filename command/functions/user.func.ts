@@ -55,6 +55,8 @@ export async function createAppUser() {
     userRes[reg.uid] = user;
     console.log(atob(reg.uid), user.password);
   });
+  // TODO: Group Dummy Remove
+  setDummyGroup(userRes);
   await docUser.update(userRes);
   //TODO: 이메일 발송
 }
@@ -70,6 +72,23 @@ export async function setDailyCount() {
     }
   }
   await db.ref(DOC_NAME_COUNTER).update(dailyCount);
+}
+
+function setDummyGroup(userRes: any) {
+  const GROUP_SIZE = 10;
+  let mgc = 0;
+  let fgc = 0;
+  for (const key of Object.keys(userRes)) {
+    const sex = userRes[key].sex;
+    if (sex === 'm') {
+      mgc++;
+      userRes[key].group = `${sex}${Math.ceil(mgc / GROUP_SIZE)}`;
+    } else {
+      fgc++;
+      userRes[key].group = `${sex}${Math.ceil(fgc / GROUP_SIZE)}`;
+    }
+  }
+  console.log({ mgc, fgc });
 }
 
 function getSixDigits(): string {

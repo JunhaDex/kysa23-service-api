@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsString } from "class-validator";
 
 export class MessageDto {
   @IsString()
@@ -6,4 +6,26 @@ export class MessageDto {
   public recipient;
   @IsBoolean()
   public notify;
+}
+
+export class UserDto {
+  @IsString()
+  @IsNotEmpty()
+  public bio;
+
+  @IsString()
+  @IsNotEmpty()
+  public tweet;
+
+  @IsString()
+  @IsNotEmpty()
+  public mbti;
+
+  @IsString()
+  @IsNotEmpty()
+  public interest;
+
+  @IsArray()
+  @IsNotEmpty()
+  public ageGroup;
 }

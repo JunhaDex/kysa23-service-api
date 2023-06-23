@@ -25,6 +25,7 @@ export interface User extends Register {
   interest: string;
   ageGroup: number[]; // tuple of year
   count?: number;
+  group: string;
 }
 
 export class Message {
