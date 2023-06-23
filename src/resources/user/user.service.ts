@@ -169,15 +169,36 @@ export class UserService {
   async getUser(
     myId: string,
     reqId: string,
-  ): Promise<{ self: User; data: User; relation: RelationType }> {
+  ): Promise<{
+    self: User;
+    data: User;
+    relation: { sent: boolean; received: RelationType };
+  }> {
     const doc = this.db.ref(DOC_NAME_USER);
     const me = await this.checkToken(myId);
     const instance = await doc.child(reqId).once('value');
+    const mySend = await this.db
+      .ref(DOC_NAME_MATCH)
+      .child(myId)
+      .child(reqId)
+      .once('value');
+    const myReceieve = await this.db
+      .ref(DOC_NAME_INBOX)
+      .child(myId)
+      .child(reqId)
+      .once('value');
     if (instance.val()) {
       return {
         self: me,
         data: this.cleanInfo(instance.val(), 'detail'),
-        relation: RelationTypes.None,
+        relation: {
+          sent: !!mySend.val(),
+          received: myReceieve.val()
+            ? myReceieve.val().msgType === ActionTypes.Match
+              ? RelationTypes.Match
+              : RelationTypes.Contact
+            : RelationTypes.None,
+        },
       };
     }
     throw new UserError(404, 'User Not Exist');

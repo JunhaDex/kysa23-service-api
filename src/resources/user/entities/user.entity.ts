@@ -9,8 +9,7 @@ export type ActionType = (typeof ActionTypes)[keyof typeof ActionTypes];
 
 export const RelationTypes = {
   None: 'none',
-  Revealed: 'revealed',
-  Matched: 'matched',
+  ...ActionTypes,
 };
 
 export type RelationType = (typeof RelationTypes)[keyof typeof RelationTypes];
