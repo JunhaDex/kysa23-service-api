@@ -17,7 +17,8 @@ import {
   getJsonLog,
   getYearBorn,
   PAGE_SIZE,
-  paginate,
+  paginateUser,
+  paginateMessage,
   unixNow,
 } from '@/utils/index.util';
 import {
@@ -154,7 +155,7 @@ export class UserService {
     let totalPage = 0;
     if (res.val()) {
       const total = Object.values(res.val()) as User[];
-      const userList = paginate(total, page, PAGE_SIZE, query);
+      const userList = paginateUser(total, page, PAGE_SIZE, query);
       totalPage = Math.ceil(userList.count / PAGE_SIZE);
       pageData.push(...userList.list);
     }
@@ -169,9 +170,15 @@ export class UserService {
     } as Page<User>;
   }
 
-  async getSystemCount() {
-    const request = (await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0;
-    const match = (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0;
+  async getSystemCount(): Promise<{
+    request: number;
+    match: number;
+    group: number;
+  }> {
+    const request =
+      Number(await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0;
+    const match =
+      Number(await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0;
     const group = 10;
     return { request, match, group };
   }
@@ -248,7 +255,10 @@ export class UserService {
   ): Promise<Page<{ user: User; message: Message }>> {
     const me = await this.checkToken(uid);
     const page = query ? (query.page && query.page > 0 ? query.page : 1) : 1;
-    const msgRef = await this.db.ref(DOC_NAME_INBOX).child(uid).once('value');
+    const msgRef = await this.db
+      .ref(`${DOC_NAME_INBOX}/${uid}`)
+      .orderByChild('msgType')
+      .once('value');
     const messages = [
       ...(msgRef.val() ? Object.entries(msgRef.val()).reverse() : []),
     ];
@@ -266,7 +276,7 @@ export class UserService {
         );
       });
     }
-    const paged = paginate(lists, page, PAGE_SIZE);
+    const paged = paginateMessage(lists, page, PAGE_SIZE);
     const totalPage = Math.ceil(paged.count / PAGE_SIZE);
     return {
       items: paged.list,
@@ -292,7 +302,7 @@ export class UserService {
     const messages = [
       ...(msgRef.val() ? Object.entries(msgRef.val()).reverse() : []),
     ];
-    const paged = paginate(messages, page, PAGE_SIZE);
+    const paged = paginateMessage(messages, page, PAGE_SIZE);
     const totalPage = Math.ceil(paged.count / PAGE_SIZE);
     const lists = [];
     for (const [k, v] of paged.list) {
@@ -376,6 +386,9 @@ export class UserService {
             this.updateSystemCount()
               .then(async () => {
                 const count = await this.getSystemCount();
+                const newMatch = count.match + 1;
+                await counter.child('matches').set(newMatch);
+                await this.updateSystemCount();
               })
               .catch((e) => {
                 this.logger.warn(`Cache Update Failed :::: ${e.message}`);
@@ -458,6 +471,9 @@ export class UserService {
     }
     for (const key of deletable) {
       delete cleaned[key];
+    }
+    if (usage === 'detail' && !cleaned.ageGroup) {
+      cleaned.ageGroup = [20, 35];
     }
     return cleaned;
   }

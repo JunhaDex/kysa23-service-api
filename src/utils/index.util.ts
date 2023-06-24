@@ -37,7 +37,7 @@ export function getJsonLog(obj: any): string {
   return log;
 }
 
-export function paginate(
+export function paginateUser(
   list: any[],
   page: number,
   pageSize: number,
@@ -57,6 +57,23 @@ export function paginate(
     const bn = Number(b.group.substring(1));
     return an - bn;
   });
+  if (pgn.list.length > pageSize) {
+    pgn.list = pgn.list.slice((page - 1) * pageSize, page * pageSize);
+  } else {
+    if (page > 1) {
+      pgn.list = [];
+    }
+  }
+  return pgn;
+}
+
+export function paginateMessage(
+  list: any[],
+  page: number,
+  pageSize: number,
+): { count: number; list: any[] } {
+  const pgn = { count: 0, list };
+  pgn.count = pgn.list.length;
   if (pgn.list.length > pageSize) {
     pgn.list = pgn.list.slice((page - 1) * pageSize, page * pageSize);
   } else {
