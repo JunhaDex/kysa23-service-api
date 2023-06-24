@@ -172,7 +172,8 @@ export class UserService {
   async getSystemCount() {
     const request = (await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0;
     const match = (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0;
-    return { request, match };
+    const group = 10;
+    return { request, match, group };
   }
 
   async pushSystemCache(uid: string, rCnt: number, mCnt: number) {
@@ -182,7 +183,6 @@ export class UserService {
     }
   }
 
-  // TODO: real-time update match cache & doc on each match count
   private async updateSystemCount() {
     const outBoxes = await this.db.ref(DOC_NAME_MATCH).once('value');
     const matches = await this.db
@@ -373,6 +373,13 @@ export class UserService {
               .child(recipientId)
               .set(message(recipientId, senderId));
             this.logger.log('matched!');
+            this.updateSystemCount()
+              .then(async () => {
+                const count = await this.getSystemCount();
+              })
+              .catch((e) => {
+                this.logger.warn(`Cache Update Failed :::: ${e.message}`);
+              });
           } else {
             if (isReveal) {
               inbox
