@@ -259,12 +259,21 @@ export class UserService {
   ): Promise<Page<{ user: User; message: Message }>> {
     const me = await this.checkToken(uid);
     const page = query ? (query.page && query.page > 0 ? query.page : 1) : 1;
-    const msgRef = await this.db
-      .ref(`${DOC_NAME_INBOX}/${uid}`)
+    const matchRef = await this.db
+      .ref(`${DOC_NAME_INBOX}`)
+      .child(uid)
       .orderByChild('msgType')
+      .equalTo('match')
+      .once('value');
+    const contactRef = await this.db
+      .ref(`${DOC_NAME_INBOX}`)
+      .child(uid)
+      .orderByChild('msgType')
+      .equalTo('contact')
       .once('value');
     const messages = [
-      ...(msgRef.val() ? Object.entries(msgRef.val()).reverse() : []),
+      ...(matchRef.val() ? Object.entries(matchRef.val()).reverse() : []),
+      ...(contactRef.val() ? Object.entries(contactRef.val()).reverse() : []),
     ];
     let lists = [];
     for (const [k, v] of messages) {
@@ -298,13 +307,21 @@ export class UserService {
   ): Promise<Page<{ user: User; message: Message }>> {
     await this.checkToken(uid);
     const page = query ? (query.page && query.page > 0 ? query.page : 1) : 1;
-    const msgRef = await this.db
+    const matchRef = await this.db
       .ref(DOC_NAME_MATCH)
       .child(uid)
       .orderByChild('msgType')
+      .equalTo('match')
+      .once('value');
+    const contactRef = await this.db
+      .ref(DOC_NAME_MATCH)
+      .child(uid)
+      .orderByChild('msgType')
+      .equalTo('contact')
       .once('value');
     const messages = [
-      ...(msgRef.val() ? Object.entries(msgRef.val()).reverse() : []),
+      ...(matchRef.val() ? Object.entries(matchRef.val()).reverse() : []),
+      ...(contactRef.val() ? Object.entries(contactRef.val()).reverse() : []),
     ];
     const paged = paginateMessage(messages, page, PAGE_SIZE);
     const totalPage = Math.ceil(paged.count / PAGE_SIZE);
