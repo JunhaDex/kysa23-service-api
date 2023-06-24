@@ -230,17 +230,21 @@ export class UserService {
       .child(myId)
       .child(reqId)
       .once('value');
+    const relType = myReceieve.val()
+      ? myReceieve.val().msgType === ActionTypes.Match
+        ? RelationTypes.Match
+        : RelationTypes.Contact
+      : RelationTypes.None;
     if (instance.val()) {
       return {
         self: me,
-        data: this.cleanInfo(instance.val(), 'detail'),
+        data: this.cleanInfo(
+          instance.val(),
+          relType === RelationTypes.Match ? 'contact' : 'detail',
+        ),
         relation: {
           sent: !!mySend.val(),
-          received: myReceieve.val()
-            ? myReceieve.val().msgType === ActionTypes.Match
-              ? RelationTypes.Match
-              : RelationTypes.Contact
-            : RelationTypes.None,
+          received: relType,
         },
       };
     }
