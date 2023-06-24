@@ -100,6 +100,7 @@ Authorization: Bearer
 # Response:
 # request: 전체 요청 수
 # match: 매치 성공한 수
+# group: 시스템에 등록된 조 개수
 GET https://api.kysa.page/send/count
 Content-Type: application/json
 Authorization: Bearer

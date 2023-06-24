@@ -438,7 +438,6 @@ export class UserService {
     const detail = ['contact', 'password', 'fcm'] as const;
     const contact = ['password', 'fcm'] as const;
     const list = [
-      'geo',
       'contact',
       'password',
       'bio',
