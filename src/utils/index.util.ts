@@ -1,6 +1,6 @@
 import { Response } from '@/types/general.type';
 
-export const PAGE_SIZE = 4;
+export const PAGE_SIZE = 10;
 
 export function unixNow(): number {
   return Math.floor(new Date().getTime() / 1000);

@@ -10,7 +10,6 @@
 # token (string): JWT 토큰 (기기저장용)
 # isFirst (boolean): 첫 로그인 여부 (가입정보 미등록 유저)
 # 첫 로그인 false: 가입화면 노출, 첫 로그인 true: 바로 리스트화면 노출
-
 POST https://api.kysa.page/user/login
 Content-Type: application/json
 
@@ -30,7 +29,7 @@ Content-Type: application/json
 Authorization: Bearer
 
 {
-  "bio": "안녕하세요 이은지 입니다.",
+  "bio": "나에 대한 긴 설명",
   "tweet": "한줄 메세지 몇자 제한인가요?",
   "mbti": "INFJ",
   "interest": "영화보기",
@@ -55,7 +54,7 @@ Content-Disposition: form-data; name="file"; filename="tester.jpeg"
 < ./dump/tester.png
 --boundary
 
-# [[[ 조회 (전체, 개별, 나, 전송 건수) ]]]
+# [[[ 조회 (전체, 개별, 나, 전체 카운트) ]]]
 
 ### User List
 # Query:
@@ -72,8 +71,7 @@ Content-Disposition: form-data; name="file"; filename="tester.jpeg"
 # * Bearer 의 유저정보 기준으로 반대성별의 유저만 보여줌
 # * 조별, 지역별 검색 기능
 
-GET https://api.kysa.page/user/list?geo=경기&page=1
-#GET http://localhost:3000/user/list?geo=경기&page=1
+GET https://api.kysa.page/user/list?page=2&geo=서울남
 Content-Type: application/json
 Authorization: Bearer
 
@@ -86,8 +84,7 @@ Authorization: Bearer
 # * none: 아무 상호작용 없음
 # * revealed: 나를 알림
 # * matched: 매치 성사
-GET https://api.kysa.page/user/Z2tzdG1mdHRAbmF2ZXIuY29t
-#GET http://localhost:3000/user/Z2tzdG1mdHRAbmF2ZXIuY29t
+GET https://api.kysa.page/user/ZGFiaW5raW05ODEwQGdtYWlsLmNvbQ==
 Content-Type: application/json
 Authorization: Bearer
 
@@ -95,12 +92,18 @@ Authorization: Bearer
 ### My Detail
 # Response:
 # 내 정보 -> 수정은 Update User Profile 참조
-#GET https://api.kysa.page/user/my
-GET http://localhost:3000/user/my
+GET https://api.kysa.page/user/my
 Content-Type: application/json
 Authorization: Bearer
 
 ### GET System Count
+# Response:
+# request: 전체 요청 수
+# match: 매치 성공한 수
+GET https://api.kysa.page/send/count
+Content-Type: application/json
+Authorization: Bearer
+
 
 # [[[ 액션 (상대방에게 나를 알리기, 나를 숨기고 관심 표현하기) ]]]
 
@@ -108,7 +111,7 @@ Authorization: Bearer
 # Request:
 # recipient(string): 상대방 uid
 # notify(boolean): 공개여부
-POST http://localhost:3000/send/match
+POST https://api.kysa.page/send/match
 Content-Type: application/json
 Authorization: Bearer
 
@@ -121,12 +124,23 @@ Authorization: Bearer
 # [[[로그 (나의 Outbox(내가 선택한사람), 나의 Inbox(나를 선택한사람))]]]
 
 ### My Outbox
-GET http://localhost:3000/send/outbox?page=1
+# Response:
+# items (User[]): 유저 목록
+# currentPage: 현재 페이지
+# totalPage: 전체 페이지 수
+# count: 페이지 아이템 수
+GET https://api.kysa.page/send/outbox?page=1
 Content-Type: application/json
 Authorization: Bearer
 
+
 ### My Inbox
-GET http://localhost:3000/send/inbox
+# Response:
+# items (User[]): 유저 목록
+# currentPage: 현재 페이지
+# totalPage: 전체 페이지 수
+# count: 페이지 아이템 수
+GET https://api.kysa.page/send/inbox
 Content-Type: application/json
 Authorization: Bearer
 
