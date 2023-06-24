@@ -366,6 +366,7 @@ export class UserService {
             to: rid,
             msgType,
             isReveal: msgType === ActionTypes.Match ? true : isReveal,
+            sentAt: unixNow(),
           };
         };
         try {
@@ -458,7 +459,6 @@ export class UserService {
       'contact',
       'password',
       'bio',
-      'tweet',
       'mbti',
       'fcm',
       'interest',

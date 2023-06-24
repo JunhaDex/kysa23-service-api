@@ -32,6 +32,7 @@ export class Message {
   to: string;
   msgType: ActionType;
   isReveal: boolean;
+  sentAt: number;
 }
 
 export interface UserCredential {
