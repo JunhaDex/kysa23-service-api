@@ -84,7 +84,7 @@ Authorization: Bearer
 # * none: 아무 상호작용 없음
 # * revealed: 나를 알림
 # * matched: 매치 성사
-GET https://api.kysa.page/user/ZGFiaW5raW05ODEwQGdtYWlsLmNvbQ==
+GET https://api.kysa.page/user/<uid>
 Content-Type: application/json
 Authorization: Bearer
 
@@ -92,7 +92,7 @@ Authorization: Bearer
 ### My Detail
 # Response:
 # 내 정보 -> 수정은 Update User Profile 참조
-GET https://api.kysa.page/user/my
+GET http://localhost:3000/user/my
 Content-Type: application/json
 Authorization: Bearer
 
@@ -117,7 +117,7 @@ Content-Type: application/json
 Authorization: Bearer
 
 {
-  "recipient": "a2p1bmhhNzdAZ21haWwuY29t",
+  "recipient": "<uid>",
   "notify": true
 }
 

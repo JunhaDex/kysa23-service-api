@@ -74,6 +74,11 @@ export async function setDailyCount() {
   await db.ref(DOC_NAME_COUNTER).update(dailyCount);
 }
 
+// count match
+
+// send user pwd email
+function sendUserPwd() {}
+
 function setDummyGroup(userRes: any) {
   const GROUP_SIZE = 10;
   let mgc = 0;
