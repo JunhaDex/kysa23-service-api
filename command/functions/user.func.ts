@@ -7,7 +7,7 @@ import chalk from 'chalk';
 const DOC_NAME_REGISTER = 'register';
 const DOC_NAME_USER = 'user';
 const DOC_NAME_COUNTER = 'counter';
-const DAILY_COUNT = 10;
+const DAILY_COUNT = 100;
 const WHITELISTONLY = ['rlarlfah303@gmail.com', 'kjunha77@gmail.com'];
 
 export async function createAppUser() {

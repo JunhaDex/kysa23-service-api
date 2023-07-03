@@ -40,7 +40,7 @@ const specialTag = `
   </div>`;
 
 export async function sendGroupEmail() {
-  const REGIDX = 184;
+  const REGIDX = 178;
   console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const formData = (await getSheet(REGIDX + 13)).filter(
@@ -103,7 +103,7 @@ export async function sendGroupEmail() {
       );
       console.error(JSON.stringify(e));
       timestamps.push(['']);
-      await updateTimestamp(REGIDX + 14, REGIDX + 2, timestamps);
+      await updateTimestamp(REGIDX + 13, REGIDX + 2, timestamps);
       throw new Error('Email Failed');
     }
     timestamps.push([current.toString()]);

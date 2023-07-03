@@ -85,7 +85,7 @@ export class UserService {
     const instance = await doc.child(id).once('value');
     if (instance.val()) {
       // resize
-      const buffer = await sharp(file.buffer)
+      const buffer = await sharp(file.buffer, { failOn: 'truncated' })
         .resize({ width: 550, height: 550 }) //TODO: 이미지 사이즈 확인
         .jpeg({
           quality: 85,
