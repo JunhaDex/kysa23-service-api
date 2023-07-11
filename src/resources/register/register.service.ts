@@ -5,6 +5,7 @@ import { unixNow } from '@/utils/index.util';
 import { getFirebase } from '@/providers/firebase.provider';
 
 const DB_NAME = 'register';
+const DB_COUPON = 'reg_coupon';
 
 @Injectable()
 export class RegisterService {
@@ -29,6 +30,16 @@ export class RegisterService {
       return true;
     }
     return false;
+  }
+
+  async getCoupon(
+    key: string,
+  ): Promise<{ code: string; rank: string } | undefined> {
+    const ctb = this.db.ref(DB_COUPON); // coupon table
+    const instance = await ctb.child(`_${key}`).once('value');
+    if (instance.val()) {
+      return instance.val();
+    }
   }
 
   async getCount() {

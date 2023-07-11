@@ -4,6 +4,7 @@ import * as process from 'process';
 import { pullFormData, updateSheetInfo } from './functions/register.func';
 import { sendGroupEmail } from './functions/email.func';
 import * as dotenv from 'dotenv';
+import { addCoupon } from './functions/misc.func';
 
 dotenv.config();
 
@@ -14,8 +15,8 @@ program
   .option('-uu --update-user', 'get app users from register')
   .option('-rc --reset-count', 'reset daily count')
   .option('-se --send-email', 'send group email')
+  .option('-mm --miscTest', 'cli test endpoint')
   .parse(process.argv);
-// TODO: 일일 선택권 초기화
 // TODO: 모바일 알림
 const options = program.opts();
 
@@ -32,4 +33,6 @@ if (options.updateUser) {
   sendGroupEmail().then(cb);
 } else if (options.resetCount) {
   setDailyCount().then(cb);
+} else if (options.miscTest) {
+  addCoupon().then(cb);
 }

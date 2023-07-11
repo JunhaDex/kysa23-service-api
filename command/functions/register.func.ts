@@ -29,8 +29,8 @@ const COMMON_MAILER = [
 ] as const;
 
 export async function pullFormData() {
-  const ROWNUM = 191; // min = 2
-  const REGIDX = 183;
+  const ROWNUM = 462; // min = 2
+  const REGIDX = 446;
   const LANG: 'kor' | 'eng' = 'kor';
   const formData = (await getForm(ROWNUM, LANG)).filter(
     (row: any[]) => !!row[0],

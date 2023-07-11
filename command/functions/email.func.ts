@@ -27,12 +27,9 @@ const specialTag = `
 <div class="price-tag-bg bg-blue">
     <div class="price-tag">
       <div style="text-align: center; font-weight: bold; margin-bottom: 2rem; font-size: 1.2rem">대회 참가비</div>
-      <div style="margin-left: 2.5rem; font-size: 1.2rem; text-decoration: line-through; color: #cec8d8">
-        60,000 원
-      </div>
       <div style="text-align: center; font-size: 2.2rem; font-weight: bold; margin-bottom: 2rem; color: #052f5f">
-        50,000 <span style="font-size:1.3rem; font-weight: bold; color: #555555">원</span></div>
-      <div style="text-align: center; color: #555555">얼리버드 할인 혜택 적용<br /> <a
+        60,000 <span style="font-size:1.3rem; font-weight: bold; color: #555555">원</span></div>
+      <div style="text-align: center; color: #555555"><a
         href="https://kysa23-finance.notion.site/2023-2e75c081bf054430ab54e7fbd8e8b7f2" target="_blank"
         style="color: #555555">납부방법</a> 확인하기
       </div>
@@ -40,7 +37,7 @@ const specialTag = `
   </div>`;
 
 export async function sendGroupEmail() {
-  const REGIDX = 178;
+  const REGIDX = 447;
   console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const formData = (await getSheet(REGIDX + 13)).filter(
@@ -109,5 +106,5 @@ export async function sendGroupEmail() {
     timestamps.push([current.toString()]);
     index++;
   }
-  await updateTimestamp(REGIDX + 14, REGIDX + 2, timestamps);
+  await updateTimestamp(REGIDX + 13, REGIDX + 2, timestamps);
 }

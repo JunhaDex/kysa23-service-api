@@ -20,6 +20,21 @@ export async function createAppUser() {
     docUser.once('value'),
   ]);
   const registers = snapRef.val() ?? {};
+  // #### Add Custom User ####
+  // const registers = {};
+  // registers[btoa('test.user.m@google.com')] = {
+  //   consent: 1688168263,
+  //   contact: '01012341233',
+  //   createdAt: 1688304189,
+  //   dob: '1997/10/20',
+  //   email: 'test.user.m@google.com',
+  //   geo: '서울 강남',
+  //   isMember: true,
+  //   joins: [25, 26, 27],
+  //   name: 'Test User M',
+  //   sex: 'm',
+  //   uid: btoa('test.user.m@google.com'),
+  // };
   const users = snapUser.val() ?? {};
   const target = Object.keys(registers).filter(
     (key) => !Object.keys(users).includes(key),
