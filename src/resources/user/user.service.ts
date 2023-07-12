@@ -175,10 +175,12 @@ export class UserService {
     match: number;
     group: number;
   }> {
-    const request =
-      Number(await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0;
-    const match =
-      Number(await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0;
+    const request = Number(
+      (await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0,
+    );
+    const match = Number(
+      (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
+    );
     const group = 26;
     return { request, match, group };
   }
@@ -196,11 +198,13 @@ export class UserService {
       .ref(DOC_NAME_COUNTER)
       .child('matches')
       .once('value');
-    await this.pushSystemCache(
-      ADK,
-      Object.keys(outBoxes.val()).length,
-      Number(matches.val() ?? 0),
-    );
+    let outCount = 0;
+    if (outBoxes.val() && matches.val()) {
+      for (const out of Object.values(outBoxes.val())) {
+        outCount += Object.keys(out).length;
+      }
+      await this.pushSystemCache(ADK, outCount, Number(matches.val() ?? 0));
+    }
   }
 
   /**
