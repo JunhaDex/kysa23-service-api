@@ -37,7 +37,7 @@ const specialTag = `
   </div>`;
 
 export async function sendGroupEmail() {
-  const REGIDX = 447;
+  const REGIDX = 467;
   console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const formData = (await getSheet(REGIDX + 13)).filter(

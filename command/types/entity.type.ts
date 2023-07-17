@@ -8,6 +8,7 @@ export interface Register {
   geo: string;
   isMember: boolean;
   createdAt: number; // unix
+  group?: string;
 }
 
 export interface User extends Register {

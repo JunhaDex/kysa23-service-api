@@ -2,7 +2,7 @@ import { google } from 'googleapis';
 import cred from '../.config.json';
 import path from 'path';
 
-const BULK_VOLUME = 0;
+export const BULK_VOLUME = 100;
 
 export async function bootstrap() {
   const secPath = path.join(process.cwd(), cred.fbAdmin);

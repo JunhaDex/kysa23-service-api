@@ -1,7 +1,11 @@
 import { Command } from 'commander';
 import { createAppUser, setDailyCount } from './functions/user.func';
 import * as process from 'process';
-import { pullFormData, updateSheetInfo } from './functions/register.func';
+import {
+  pullFormData,
+  updateRegister,
+  updateSheetInfo,
+} from './functions/register.func';
 import { sendGroupEmail } from './functions/email.func';
 import * as dotenv from 'dotenv';
 import { addCoupon } from './functions/misc.func';
@@ -34,5 +38,5 @@ if (options.updateUser) {
 } else if (options.resetCount) {
   setDailyCount().then(cb);
 } else if (options.miscTest) {
-  addCoupon().then(cb);
+  updateRegister().then(cb);
 }

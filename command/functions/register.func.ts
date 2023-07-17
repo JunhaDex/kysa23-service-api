@@ -1,4 +1,10 @@
-import { appendSheet, getForm, markCopy } from '../providers/gdrive.provider';
+import {
+  appendSheet,
+  BULK_VOLUME,
+  getForm,
+  getSheet,
+  markCopy,
+} from '../providers/gdrive.provider';
 import { getFirebase } from '../providers/firebase.provider';
 import { getDatabase } from 'firebase-admin/database';
 import { Register } from '../types/entity.type';
@@ -29,8 +35,8 @@ const COMMON_MAILER = [
 ] as const;
 
 export async function pullFormData() {
-  const ROWNUM = 462; // min = 2
-  const REGIDX = 446;
+  const ROWNUM = 482; // min = 2
+  const REGIDX = 467;
   const LANG: 'kor' | 'eng' = 'kor';
   const formData = (await getForm(ROWNUM, LANG)).filter(
     (row: any[]) => !!row[0],
@@ -128,4 +134,80 @@ export function updateSheetInfo(register: Register) {
   });
   row.push('온라인');
   return row;
+}
+
+export async function updateRegister() {
+  // Get Database
+  const app = await getFirebase();
+  const db = getDatabase(app);
+  const docRef = db.ref(DOC_NAME_REGISTER);
+  const registers = (await docRef.once('value')).val() ?? {};
+  console.log('DATABASE LOADED');
+  // Load first 100 row data
+  let formData = (await getSheet(14)).filter((row: any[]) => !!row[0]);
+  let round = 1;
+  const txs = [];
+  const del = [];
+  while (formData.length) {
+    console.log(`START (${round}): ${formData.length} count`);
+    for (const row of formData) {
+      const reg = registers[row[1]];
+      const canceled = !!row[16]?.length;
+      if (reg) {
+        // renew data and check if anything changed
+        if (canceled) {
+          del.push(reg);
+        } else {
+          const parsed = parseRegister(reg, row);
+          if (parsed.isChanged) {
+            txs.push(parsed.reg);
+          }
+        }
+      }
+    }
+    // Reload next 100 row data
+    formData = (await getSheet(14 + BULK_VOLUME * round)).filter(
+      (row: any[]) => !!row[0],
+    );
+    console.log(
+      `NEXT: ${14 + BULK_VOLUME * round} ~ ${14 + BULK_VOLUME * (round + 1)} (${
+        formData.length
+      })`,
+    );
+    console.log('changed: ', txs.length);
+    round++;
+  }
+  const ans = await inquirer.prompt([
+    {
+      name: 'continue',
+      message: `changed: ${txs.length}, deleted: ${del.length} proceed?`,
+    },
+  ]);
+  if (ans.continue.toLowerCase() !== 'y') {
+    console.log(chalk.red('PROCESS CANCELED'));
+    throw new Error('Process Canceled');
+  }
+  await Promise.all(txs.map((tx) => docRef.child(tx.uid).update(tx)));
+  await Promise.all(del.map((tx) => docRef.child(tx.uid).set(null)));
+}
+
+function parseRegister(
+  orig: Register,
+  arr: any[],
+): { reg: Register; isChanged: boolean } {
+  const updated = {
+    dob: arr[2],
+    geo: arr[3],
+    sex: arr[4],
+    contact: arr[6],
+    // Add Group Info
+  };
+  let isChanged = false;
+  for (const key of Object.keys(updated)) {
+    if (orig[key] !== updated[key]) {
+      isChanged = true;
+      orig[key] = updated[key];
+    }
+  }
+  return { reg: orig, isChanged };
 }
