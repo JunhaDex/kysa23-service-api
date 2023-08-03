@@ -11,7 +11,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { getDatabase } from 'firebase-admin/database';
 import { getStorage } from 'firebase-admin/storage';
-import { getFirebase } from '@/providers/firebase.provider';
+import { getFirebase, sendMessage } from '@/providers/firebase.provider';
 import sharp from 'sharp';
 import {
   getJsonLog,
@@ -36,6 +36,9 @@ const REG_COUNT_CACHE_KEY = 'rCnt';
 const MATCH_COUNT_CACHE_KEY = 'mCnt';
 const BUCKET_USER_PROFILE = 'user/profiles';
 const ADK = 'a2p1bmhhNzdAZ21haWwuY29t';
+const NOTI_MATCH_TITLE =
+  '🐰달달 알림: 매치 성공! 내가 관심있는 그 사람이 혹시??';
+const NOTI_MESSAGE = '지금 바로 앱을열어 상대방을 확인해 보세요!';
 
 @Injectable()
 export class UserService {
@@ -124,8 +127,8 @@ export class UserService {
       if (user.password === cred.password) {
         const payload = { uid: user.uid, name: user.name, dob: user.dob };
         this.logger.log(`Logged in: ${getJsonLog(payload)}`);
-        // user.fcm = cred.fcm;
-        // await instance.child(user.uid).update(user);
+        user.fcm = cred.fcm;
+        await instance.child(user.uid).update(user);
         const accessToken = await this.jwt.signAsync(payload);
         const isFirst = !(user.image || user.bio);
         return { token: accessToken, isFirst } as UserAuth;
@@ -427,12 +430,37 @@ export class UserService {
               .catch((e) => {
                 this.logger.warn(`Cache Update Failed :::: ${e.message}`);
               });
+            sendMessage(sender.fcm, {
+              notification: {
+                title: NOTI_MATCH_TITLE,
+                message: NOTI_MESSAGE,
+              },
+            }).catch((e) => {
+              this.logger.warn(`Match Noti Failed (ss) :::: ${e.message}`);
+            });
+            sendMessage(recipient.fcm, {
+              notification: {
+                title: NOTI_MATCH_TITLE,
+                message: NOTI_MESSAGE,
+              },
+            }).catch((e) => {
+              this.logger.warn(`Match Noti Failed (rr) :::: ${e.message}`);
+            });
           } else {
             if (isReveal) {
               inbox
                 .child(recipientId)
                 .child(senderId)
                 .set(message(senderId, recipientId));
+              sendMessage(recipient.fcm, {
+                notification: {
+                  title:
+                    '🐰달달 알림: 관심 도착! 나에게 관심을 표현한 사람 누구일까요?',
+                  message: NOTI_MESSAGE,
+                },
+              }).catch((e) => {
+                this.logger.warn(`SEND NOTI FAILED :::: ${e.message}`);
+              });
             }
           }
           this.logger.log(

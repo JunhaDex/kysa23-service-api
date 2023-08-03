@@ -11,3 +11,12 @@ export interface Page<Type> {
   totalPage: number;
   count?: number;
 }
+
+export interface Message {
+  to?: string;
+  priority?: string;
+  notification: {
+    title: string;
+    message: string;
+  };
+}
