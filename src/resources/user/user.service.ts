@@ -128,7 +128,7 @@ export class UserService {
         const payload = { uid: user.uid, name: user.name, dob: user.dob };
         this.logger.log(`Logged in: ${getJsonLog(payload)}`);
         user.fcm = cred.fcm;
-        await instance.child(user.uid).update(user);
+        await doc.child(user.uid).update(user);
         const accessToken = await this.jwt.signAsync(payload);
         const isFirst = !(user.image || user.bio);
         return { token: accessToken, isFirst } as UserAuth;
@@ -192,7 +192,7 @@ export class UserService {
     const match = Number(
       (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
     );
-    const group = 30;
+    const group = 31;
     return { request, match, group };
   }
 
