@@ -27,7 +27,7 @@ export async function sendMessage(fcm: string, noti: Message) {
         'Content-Type': 'application/json',
       },
     });
-    await api.post('send', {
+    return await api.post('send', {
       to: fcm,
       priority: 'high',
       notification: { ...noti.notification },
