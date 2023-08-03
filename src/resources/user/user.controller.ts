@@ -18,7 +18,7 @@ import { User, UserCredential } from '@/resources/user/entities/user.entity';
 import { okMessage } from '@/utils/index.util';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileSizeValidationPipe } from '@/utils/file.pipe';
-import { UserDto } from "@/resources/user/dto/message.input";
+import { UserDto } from '@/resources/user/dto/message.input';
 
 @Controller('user')
 export class UserController {

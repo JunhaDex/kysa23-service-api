@@ -7,7 +7,7 @@ import chalk from 'chalk';
 const DOC_NAME_REGISTER = 'register';
 const DOC_NAME_USER = 'user';
 const DOC_NAME_COUNTER = 'counter';
-const DAILY_COUNT = 100;
+const DAILY_COUNT = 10;
 const WHITELISTONLY = ['rlarlfah303@gmail.com', 'kjunha77@gmail.com'];
 
 export async function createAppUser() {
@@ -70,8 +70,6 @@ export async function createAppUser() {
     userRes[reg.uid] = user;
     console.log(atob(reg.uid), user.password);
   });
-  // TODO: Group Dummy Remove
-  setDummyGroup(userRes);
   await docUser.update(userRes);
   //TODO: 이메일 발송
 }

@@ -149,8 +149,16 @@ export class UserService {
     const doc = this.db.ref(DOC_NAME_USER);
     const me = await this.checkToken(uid);
     const oppo = me.sex === 'm' ? 'f' : 'm';
-    // orderByChild('group')
-    const res = await doc.orderByChild('sex').equalTo(oppo).once('value');
+    let res: any;
+    if (query.group) {
+      res = await doc
+        .orderByChild('group')
+        .equalTo(`${oppo}${query.group}`)
+        .once('value');
+      delete query.group;
+    } else {
+      res = await doc.orderByChild('sex').equalTo(oppo).once('value');
+    }
     const pageData = [];
     let totalPage = 0;
     if (res.val()) {
@@ -181,7 +189,7 @@ export class UserService {
     const match = Number(
       (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
     );
-    const group = 26;
+    const group = 30;
     return { request, match, group };
   }
 
@@ -199,7 +207,7 @@ export class UserService {
       .child('matches')
       .once('value');
     let outCount = 0;
-    if (outBoxes.val() && matches.val()) {
+    if (outBoxes.val() && !(matches.val() == null)) {
       for (const out of Object.values(outBoxes.val())) {
         outCount += Object.keys(out).length;
       }
