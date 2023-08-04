@@ -14,7 +14,13 @@ export async function setGroup() {
   const app = await getFirebase();
   const db = getDatabase(app);
   const docRef = db.ref(DOC_NAME_REGISTER);
-  const registers = (await docRef.once('value')).val() ?? {};
+  const origin = (await docRef.once('value')).val() ?? {};
+  const registers = {};
+  for (const key of Object.keys(origin)) {
+    if (!origin[key].group) {
+      registers[key] = origin[key];
+    }
+  }
   console.log('DATABASE LOADED');
   const minSize = Math.floor(MAX_PER_GROUP * FILL_RATE);
   const maxSize = Math.ceil(MAX_PER_GROUP * FILL_RATE);
@@ -51,6 +57,7 @@ export async function setGroup() {
     return mStat + '\n' + fStat;
   });
   console.log(stats.join('\n'));
+  // return;
   await Promise.all(
     baskets.map((bsk) => {
       return new Promise(async (resolve) => {

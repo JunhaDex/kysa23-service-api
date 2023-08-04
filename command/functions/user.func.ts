@@ -3,12 +3,16 @@ import { getDatabase } from 'firebase-admin/database';
 import { Register, User } from '../types/entity.type';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import fs from 'fs';
+import sgMail from '@sendgrid/mail';
+import process from 'process';
+import { updateTimestamp } from '../providers/gdrive.provider';
 
 const DOC_NAME_REGISTER = 'register';
 const DOC_NAME_USER = 'user';
 const DOC_NAME_COUNTER = 'counter';
 const DAILY_COUNT = 10;
-const WHITELISTONLY = ['rlarlfah303@gmail.com', 'kjunha77@gmail.com'];
+const OP_GRP = [] as const;
 
 export async function createAppUser() {
   const app = await getFirebase();
@@ -90,7 +94,51 @@ export async function setDailyCount() {
 // count match
 
 // send user pwd email
-function sendUserPwd() {}
+export async function sendUserPwd() {
+  console.log(process.env.SENDGRID_API_KEY);
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const app = await getFirebase();
+  const db = getDatabase(app);
+  const docUser = db.ref(DOC_NAME_USER);
+  const users = (await docUser.once('value')).val() ?? {};
+  const opFilter = OP_GRP.map((email: string) => btoa(email));
+  const uList = Object.values(users).filter((user: User) =>
+    opFilter.includes(user.uid),
+  ) as User[];
+  const template = fs.readFileSync('./command/templates/user-password.html', {
+    encoding: 'utf8',
+  });
+  console.log(`Emails to send: ${uList.length} email(s)`);
+  // return;
+  for (const user of uList) {
+    let contents = template;
+    Object.keys(user).forEach((key) => {
+      contents = contents.replace(`<%user_${key}%>`, user[key]);
+    });
+    const msg = {
+      to: user.email,
+      from: 'noreply@kysa.page',
+      subject: '[2023 KYSA] 데이팅 앱 "달달" 대회기간 중 사용 안내',
+      html: contents,
+    };
+    try {
+      const result = await sgMail.send(msg);
+      if (result[0].statusCode < 299) {
+        console.log(`Email sent to: ${user.email} (${user.name})`);
+      } else {
+        console.log(
+          chalk.bgRed('DANGER: Error Code Uncommon: ', JSON.stringify(user)),
+        );
+      }
+    } catch (e) {
+      console.log(
+        chalk.bgRed(`ERROR: Send Failed(${e.code}): `, JSON.stringify(user)),
+      );
+      console.error(JSON.stringify(e));
+      throw new Error('Email Failed');
+    }
+  }
+}
 
 function setDummyGroup(userRes: any) {
   const GROUP_SIZE = 10;

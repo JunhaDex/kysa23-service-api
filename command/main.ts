@@ -1,5 +1,9 @@
 import { Command } from 'commander';
-import { createAppUser, setDailyCount } from './functions/user.func';
+import {
+  createAppUser,
+  sendUserPwd,
+  setDailyCount,
+} from './functions/user.func';
 import * as process from 'process';
 import {
   pullFormData,
@@ -20,6 +24,7 @@ program
   .option('-uu --update-user', 'get app users from register')
   .option('-rc --reset-count', 'reset daily count')
   .option('-se --send-email', 'send group email')
+  .option('-ue --user-email', 'send user email password')
   .option('-mm --miscTest', 'cli test endpoint')
   .parse(process.argv);
 // TODO: 모바일 알림
@@ -38,6 +43,8 @@ if (options.updateUser) {
   sendGroupEmail().then(cb);
 } else if (options.resetCount) {
   setDailyCount().then(cb);
+} else if (options.userEmail) {
+  sendUserPwd().then(cb);
 } else if (options.miscTest) {
   // updateRegister().then(cb);
   setGroup().then(cb);
