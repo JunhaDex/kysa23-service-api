@@ -10,7 +10,7 @@ import {
   updateRegister,
   updateSheetInfo,
 } from './functions/register.func';
-import { sendGroupEmail } from './functions/email.func';
+import { sendGroupEmail, sendPaymentEmail } from './functions/email.func';
 import * as dotenv from 'dotenv';
 import { addCoupon } from './functions/misc.func';
 import { setGroup } from './functions/group.func';
@@ -47,5 +47,6 @@ if (options.updateUser) {
   sendUserPwd().then(cb);
 } else if (options.miscTest) {
   // updateRegister().then(cb);
-  setGroup().then(cb);
+  // setGroup().then(cb);
+  sendPaymentEmail().then(cb);
 }

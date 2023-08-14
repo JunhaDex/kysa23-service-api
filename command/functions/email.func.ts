@@ -37,7 +37,7 @@ const specialTag = `
   </div>`;
 
 export async function sendGroupEmail() {
-  const REGIDX = 546;
+  const REGIDX = 715;
   console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const formData = (await getSheet(REGIDX + 13)).filter(
@@ -107,4 +107,62 @@ export async function sendGroupEmail() {
     index++;
   }
   await updateTimestamp(REGIDX + 13, REGIDX + 2, timestamps);
+}
+
+export async function sendPaymentEmail() {
+  const REGIDX = 600;
+  console.log(process.env.SENDGRID_API_KEY);
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  let formData = (await getSheet(REGIDX + 13)).filter((row: any[]) => !!row[0]);
+  console.log(formData.length);
+  formData = formData.filter((data) => data[15] === undefined);
+  const ans = await inquirer.prompt([
+    {
+      name: 'continue',
+      message: `got ${formData.length} emails. Press "Y" to continue?`,
+    },
+  ]);
+  if (ans.continue.toLowerCase() !== 'y') {
+    console.log(chalk.red('PROCESS CANCELED'));
+    throw new Error('Process Canceled');
+  }
+  for (const row of formData) {
+    row[7] = row[7].split(',').map((day: string) => Number(day));
+    row[8] = row[8];
+    const obj = {
+      recipient: row[5],
+      user_name: row[0],
+      user_phone: row[6] ?? '-',
+      user_joins: `8월 ${row[7].join(', ')}일 (총 ${row[7].length}일)`,
+      user_fee: `${row[12]}원`,
+    };
+    let template = fs.readFileSync('./command/templates/payment.html', {
+      encoding: 'utf8',
+    });
+    for (const key of Object.keys(obj)) {
+      template = template.replace(`<%${key}%>`, obj[key]);
+    }
+    const msg = {
+      to: obj.recipient,
+      from: 'noreply@kysa.page',
+      subject: '[2023 KYSA] 대회비 납부 알림',
+      html: template,
+    };
+    try {
+      const result = await sgMail.send(msg);
+      if (result[0].statusCode < 299) {
+        console.log(`Email sent to: ${obj.recipient} (${obj.user_name})`);
+      } else {
+        console.log(
+          chalk.bgRed('DANGER: Error Code Uncommon: ', JSON.stringify(obj)),
+        );
+      }
+    } catch (e) {
+      console.log(
+        chalk.bgRed(`ERROR: Send Failed(${e.code}): `, JSON.stringify(obj)),
+      );
+      console.error(JSON.stringify(e));
+      throw new Error('Email Failed');
+    }
+  }
 }

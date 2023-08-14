@@ -35,8 +35,8 @@ const COMMON_MAILER = [
 ] as const;
 
 export async function pullFormData() {
-  const ROWNUM = 570; // min = 2
-  const REGIDX = 545;
+  const ROWNUM = 742; // min = 2
+  const REGIDX = 714;
   const LANG: 'kor' | 'eng' = 'kor';
   const formData = (await getForm(ROWNUM, LANG)).filter(
     (row: any[]) => !!row[0],
@@ -177,6 +177,8 @@ export async function updateRegister() {
     console.log('changed: ', txs.length);
     round++;
   }
+  console.log(JSON.stringify(txs));
+  console.log(JSON.stringify(del));
   const ans = await inquirer.prompt([
     {
       name: 'continue',

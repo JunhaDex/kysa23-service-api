@@ -100,4 +100,10 @@ export class UserActionController {
     );
     return okMessage;
   }
+
+  @Post('report')
+  async sendReport(@Req() req: any, @Body() reported: { uid: string }) {
+    Logger.log(`user reported ${reported.uid}`);
+    return okMessage;
+  }
 }

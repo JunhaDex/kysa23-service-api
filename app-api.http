@@ -11,12 +11,11 @@
 # isFirst (boolean): 첫 로그인 여부 (가입정보 미등록 유저)
 # 첫 로그인 false: 가입화면 노출, 첫 로그인 true: 바로 리스트화면 노출
 POST https://api.kysa.page/user/login
-#POST http://localhost:3000/user/login
 Content-Type: application/json
 
 {
-  "email": "kjunha77@gmail.com",
-  "password": "500046",
+  "email": "",
+  "password": "",
   "fcm": "foo-bar"
 }
 
@@ -71,11 +70,9 @@ Content-Disposition: form-data; name="file"; filename="tester.jpeg"
 # >> 유저 목록 정책 <<
 # * Bearer 의 유저정보 기준으로 반대성별의 유저만 보여줌
 # * 조별, 지역별 검색 기능
-
-#GET http://localhost:3000/user/list?group=1
-GET https://api.kysa.page/user/list?name=최서
+GET https://api.kysa.page/user/list
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhMnAxYm1oaE56ZEFaMjFoYVd3dVkyOXQiLCJuYW1lIjoi6rmA7KSA7ZWYIiwiZG9iIjoiMTk5My8wMi8xNSIsImlhdCI6MTY5MTA3NDE4MX0.vjZCuquD54ktdMfsvBJ4LrPRimoIWir6b3FdncXOcXg
+Authorization: Bearer
 
 ### User Detail
 # Response:
@@ -105,7 +102,7 @@ Authorization: Bearer
 # group: 시스템에 등록된 조 개수
 GET https://api.kysa.page/send/count
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhMnAxYm1oaE56ZEFaMjFoYVd3dVkyOXQiLCJuYW1lIjoi6rmA7KSA7ZWYIiwiZG9iIjoiMTk5My8wMi8xNSIsImlhdCI6MTY5MTA3NDE4MX0.vjZCuquD54ktdMfsvBJ4LrPRimoIWir6b3FdncXOcXg
+Authorization: Bearer
 
 
 # [[[ 액션 (상대방에게 나를 알리기, 나를 숨기고 관심 표현하기) ]]]
@@ -134,7 +131,7 @@ Authorization: Bearer
 # count: 페이지 아이템 수
 GET https://api.kysa.page/send/outbox
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhMnAxYm1oaE56ZEFaMjFoYVd3dVkyOXQiLCJuYW1lIjoi6rmA7KSA7ZWYIiwiZG9iIjoiMTk5My8wMi8xNSIsImlhdCI6MTY5MTA3NDE4MX0.vjZCuquD54ktdMfsvBJ4LrPRimoIWir6b3FdncXOcXg
+Authorization: Bearer
 
 
 ### My Inbox
@@ -145,5 +142,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhMnAxYm1oa
 # count: 페이지 아이템 수
 GET https://api.kysa.page/send/inbox
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhMnAxYm1oaE56ZEFaMjFoYVd3dVkyOXQiLCJuYW1lIjoi6rmA7KSA7ZWYIiwiZG9iIjoiMTk5My8wMi8xNSIsImlhdCI6MTY5MTA3NDE4MX0.vjZCuquD54ktdMfsvBJ4LrPRimoIWir6b3FdncXOcXg
+Authorization: Bearer
 
+### Report User
+# Response:
+# items (User[]): 유저 목록
+# currentPage: 현재 페이지
+# totalPage: 전체 페이지 수
+# count: 페이지 아이템 수
+POST https://api.kysa.page/send/report
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "uid": "foobar"
+}
