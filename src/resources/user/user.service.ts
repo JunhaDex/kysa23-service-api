@@ -154,7 +154,7 @@ export class UserService {
     const oppo = me.sex === 'm' ? 'f' : 'm';
     let res: any;
     if (query.group) {
-      res = await doc.orderByChild('group').equalTo(`${oppo}0`).once('value');
+      res = await doc.orderByChild('group').equalTo(`${oppo}${query.group}`).once('value');
       delete query.group;
     } else {
       res = await doc.orderByChild('sex').equalTo(oppo).once('value');
@@ -189,7 +189,7 @@ export class UserService {
     const match = Number(
       (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
     );
-    const group = 1;
+    const group = 33;
     return { request, match, group };
   }
 
