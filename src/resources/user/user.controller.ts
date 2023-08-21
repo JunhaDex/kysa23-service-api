@@ -92,7 +92,7 @@ export class UserController {
   /**
    * POST /user/login
    * check ID, PW and update FCM
-   * @Param credential: User ID, PWD, FCM
+   * @param credential
    */
   @Post('login')
   async login(@Body() credential: UserCredential) {
@@ -115,8 +115,8 @@ export class UserController {
   /**
    * Get /user/list
    * Filter by group
-   * @param req: req.uid auth middleware
-   * @param options: query options
+   * @param req
+   * @param options
    */
   @Get('list')
   async findAll(
@@ -136,7 +136,7 @@ export class UserController {
   /**
    * GET user/:id
    * get single user record
-   * @param req: req.uid auth middleware
+   * @param req
    * @param id
    */
   @Get(':id')

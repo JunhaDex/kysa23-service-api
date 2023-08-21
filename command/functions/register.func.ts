@@ -35,8 +35,8 @@ const COMMON_MAILER = [
 ] as const;
 
 export async function pullFormData() {
-  const ROWNUM = 742; // min = 2
-  const REGIDX = 714;
+  const ROWNUM = 771; // min = 2
+  const REGIDX = 744;
   const LANG: 'kor' | 'eng' = 'kor';
   const formData = (await getForm(ROWNUM, LANG)).filter(
     (row: any[]) => !!row[0],
@@ -198,15 +198,17 @@ function parseRegister(
   arr: any[],
 ): { reg: Register; isChanged: boolean } {
   const updated = {
+    name: arr[0],
     dob: arr[2],
     geo: arr[3],
     sex: arr[4],
+    joins: arr[7].split(', ').map((x) => Number(x)),
     contact: arr[6],
-    // Add Group Info
+    group: arr[17] ?? '',
   };
   let isChanged = false;
   for (const key of Object.keys(updated)) {
-    if (orig[key] !== updated[key]) {
+    if (!orig[key] || orig[key].toString() !== updated[key].toString()) {
       isChanged = true;
       orig[key] = updated[key];
     }

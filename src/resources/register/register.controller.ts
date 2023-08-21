@@ -7,6 +7,7 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { RegisterService } from './register.service';
 import { Register } from './entities/register.entity';
@@ -41,6 +42,69 @@ export class RegisterController {
       return res;
     } else {
       throw new HttpException(`${id} Not Found`, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  @Post('find-me')
+  async findRegister(@Body() userInfo: { name: string; phone: string }) {
+    try {
+      const register = await this.registerService.getRegister(userInfo);
+      return {
+        name: register.name,
+        email: register.email,
+      };
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      }
+    }
+  }
+
+  @Post('login')
+  async findUser(@Body() userInfo: { email: string }) {
+    try {
+      const register = await this.registerService.getOneRegister(userInfo);
+      return { register };
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      }
+    }
+  }
+
+  @Post('search/group')
+  async searchGroup(
+    @Body() userInfo: { email: string },
+    @Query()
+    options?: {
+      group?: string;
+    },
+  ) {
+    try {
+      const res = await this.registerService.searchGroup(userInfo, options);
+      return res;
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      }
+    }
+  }
+
+  @Post('search/name')
+  async searchName(
+    @Body() userInfo: { email: string },
+    @Query()
+    options?: {
+      name?: string;
+    },
+  ) {
+    try {
+      const res = await this.registerService.searchName(userInfo, options);
+      return res;
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      }
     }
   }
 }

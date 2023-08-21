@@ -2,10 +2,15 @@ import { getFirebase } from '../providers/firebase.provider';
 import { getDatabase } from 'firebase-admin/database';
 import { Register } from '../types/entity.type';
 import shuffleSeed from 'shuffle-seed';
+import {
+  BULK_VOLUME,
+  getSheet,
+  updateSheetGroup,
+} from '../providers/gdrive.provider';
 
 const DOC_NAME_REGISTER = 'register';
-const FILL_RATE = 0.7471;
-const MAX_PER_GROUP = 12;
+const FILL_RATE = 1;
+const MAX_PER_GROUP = 11;
 const EXP_REG_COUNT = 700;
 const OP_GRP = [] as const;
 const SHUFFLE_SEED = '2023KYSA';
@@ -57,7 +62,6 @@ export async function setGroup() {
     return mStat + '\n' + fStat;
   });
   console.log(stats.join('\n'));
-  // return;
   await Promise.all(
     baskets.map((bsk) => {
       return new Promise(async (resolve) => {
@@ -94,12 +98,54 @@ async function shuffleGroup(registers: Register[], baskets) {
   const last = baskets.length - 1;
   for (let i = 0; i < fromTop.length; i++) {
     const factor = Math.floor(i / last);
-    fromTop[i].group = `${fromTop[i].sex}${first + i - factor * last}`;
-    baskets[first + i - factor * last][fromTop[i].sex].push(fromTop[i]);
+    if (
+      baskets[first + i - factor * last][fromTop[i].sex].length < MAX_PER_GROUP
+    ) {
+      fromTop[i].group = `${fromTop[i].sex}${first + i - factor * last}`;
+      baskets[first + i - factor * last][fromTop[i].sex].push(fromTop[i]);
+    }
   }
   for (let i = 0; i < fromBtm.length; i++) {
     const factor = Math.floor(i / last);
-    fromBtm[i].group = `${fromBtm[i].sex}${last - i + factor * last}`;
-    baskets[last - i + factor * last][fromBtm[i].sex].push(fromBtm[i]);
+    if (
+      baskets[last - i + factor * last][fromBtm[i].sex].length < MAX_PER_GROUP
+    ) {
+      fromBtm[i].group = `${fromBtm[i].sex}${last - i + factor * last}`;
+      baskets[last - i + factor * last][fromBtm[i].sex].push(fromBtm[i]);
+    }
+  }
+}
+
+export async function updateGroup() {
+  const app = await getFirebase();
+  const db = getDatabase(app);
+  const docRef = db.ref(DOC_NAME_REGISTER);
+  const register = (await docRef.once('value')).val() ?? {};
+  console.log('DATABASE LOADED');
+  let formData = (await getSheet(14)).filter((row: any[]) => !!row[0]);
+  let round = 1;
+  while (formData.length) {
+    const groupCol = [];
+    for (const row of formData) {
+      const reg = register[row[1]];
+      let group = '';
+      if (reg) {
+        group = reg.group ?? '';
+        console.log(`${reg.name} ${reg.geo} ::: ${group}`);
+      } else {
+        console.log(`no register found ${row[0]} ${row[3]}`);
+      }
+      groupCol.push([group]);
+    }
+    await updateSheetGroup(14 + BULK_VOLUME * (round - 1), groupCol);
+    formData = (await getSheet(14 + BULK_VOLUME * round)).filter(
+      (row: any[]) => !!row[0],
+    );
+    console.log(
+      `NEXT: ${14 + BULK_VOLUME * round} ~ ${14 + BULK_VOLUME * (round + 1)} (${
+        formData.length
+      })`,
+    );
+    round++;
   }
 }

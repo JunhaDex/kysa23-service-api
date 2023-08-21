@@ -46,6 +46,113 @@ export class RegisterService {
     const document = await this.db.ref(DB_NAME).once('value');
     return { count: Object.keys(document.val()).length };
   }
+
+  async getRegister(params: { name: string; phone: string }) {
+    const document = this.db.ref(DB_NAME);
+    const instance = await document
+      .orderByChild('contact')
+      .equalTo(params.phone)
+      .once('value');
+    const registers = instance.val();
+    if (registers) {
+      const reg = Object.values(registers)
+        .filter((rr: Register) => rr.name.includes(params.name))
+        .pop() as Register;
+      if (reg) {
+        return reg;
+      }
+    }
+    throw new RegisterError(403, 'Invalid Access');
+  }
+
+  async getOneRegister(params: { email: string }) {
+    const document = this.db.ref(DB_NAME);
+    const uid = btoa(params.email);
+    const instance = await document.child(uid).once('value');
+    const register = instance.val();
+    if (register) {
+      return register;
+    }
+    throw new RegisterError(403, 'Invalid Access');
+  }
+
+  async searchGroup(
+    params: { email: string },
+    query?: {
+      group?: string;
+    },
+  ) {
+    const document = this.db.ref(DB_NAME);
+    const uid = btoa(params.email);
+    const myInst = await document.child(uid).once('value');
+    const me: Register = myInst.val();
+    if (me) {
+      const items = [];
+      let count = 0;
+      let leader: Register;
+      const groupInst = await document
+        .orderByChild('group')
+        .equalTo(query.group)
+        .once('value');
+      const result = groupInst.val();
+      if (result) {
+        let clean = Object.values(result).filter(
+          (item: Register) => item.group === query.group,
+        );
+        const ll = clean
+          .filter((item: Register) => !!item.isLeader)
+          .pop() as Register;
+        if (ll) {
+          clean = [ll, clean.filter((item: Register) => item.uid !== ll.uid)];
+        }
+        items.push(...clean);
+        count = clean.length;
+        if (me.group === query.group) {
+          leader = ll;
+        }
+      }
+      return {
+        items,
+        count,
+        leader,
+      };
+    }
+    throw new RegisterError(403, 'Invalid Access');
+  }
+
+  async searchName(
+    params: { email: string },
+    query?: {
+      name?: string;
+    },
+  ) {
+    const document = this.db.ref(DB_NAME);
+    const uid = btoa(params.email);
+    const myInst = await document.child(uid).once('value');
+    const me: Register = myInst.val();
+    if (me) {
+      const items = [];
+      let count = 0;
+      const groupInst = await document
+        .orderByChild('name')
+        .equalTo(query.name)
+        .once('value');
+      const result = groupInst.val();
+      if (result) {
+        const clean = Object.values(result).filter(
+          (item: Register) => item.name === query.name,
+        );
+        console.log(clean);
+        items.push(...clean);
+        count = clean.length;
+      }
+      return {
+        items,
+        count,
+      };
+    }
+    throw new RegisterError(403, 'Invalid Access');
+  }
 }
 
 class RegisterError extends Error {

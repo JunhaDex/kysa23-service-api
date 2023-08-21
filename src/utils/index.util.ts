@@ -51,10 +51,12 @@ export function paginateUser(
       }
     }
   }
+  // console.log(pgn.list.map((i) => i.group));
+  console.log(pgn.list);
   pgn.count = pgn.list.length;
   pgn.list.sort((a, b) => {
-    const an = Number(a.group.substring(1));
-    const bn = Number(b.group.substring(1));
+    const an = a.group ? Number(a.group.substring(1)) : 99;
+    const bn = b.group ? Number(b.group.substring(1)) : 99;
     return an - bn;
   });
   if (pgn.list.length > pageSize) {

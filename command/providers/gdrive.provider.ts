@@ -17,7 +17,7 @@ export async function bootstrap() {
 export async function getSheet(rowNum: number) {
   const sheet = await bootstrap();
   // const range = `general!C${rowNum}:T${rowNum + 100}`;
-  const range = `general!C${rowNum}:T${rowNum + BULK_VOLUME}`; //+100
+  const range = `general!C${rowNum}:T${rowNum + BULK_VOLUME - 1}`; //+100
   const result = await sheet.spreadsheets.values.get({
     spreadsheetId: cred.sheetId,
     range,
@@ -57,6 +57,18 @@ export async function updateTimestamp(
   await sheet.spreadsheets.values.append({
     spreadsheetId: cred.sheetId,
     range: c_range,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: timestamp },
+  });
+}
+
+export async function updateSheetGroup(rowNum: number, timestamp: any) {
+  const sheet = await bootstrap();
+  const range = `general!T${rowNum}:T${rowNum + BULK_VOLUME}`;
+  // update sheet
+  await sheet.spreadsheets.values.append({
+    spreadsheetId: cred.sheetId,
+    range: range,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: timestamp },
   });

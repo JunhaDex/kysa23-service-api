@@ -12,7 +12,8 @@ export interface Register {
   joins: number[];
   consent: RequiredConsent;
   // 대회 참여 정보
-  groupId: string;
+  group: string;
+  isLeader?: boolean;
   checkIn: boolean;
   // 데이터 입출력
   createdAt: number; // unix

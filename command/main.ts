@@ -13,7 +13,7 @@ import {
 import { sendGroupEmail, sendPaymentEmail } from './functions/email.func';
 import * as dotenv from 'dotenv';
 import { addCoupon } from './functions/misc.func';
-import { setGroup } from './functions/group.func';
+import { setGroup, updateGroup } from './functions/group.func';
 
 dotenv.config();
 
@@ -46,7 +46,8 @@ if (options.updateUser) {
 } else if (options.userEmail) {
   sendUserPwd().then(cb);
 } else if (options.miscTest) {
-  // updateRegister().then(cb);
+  updateRegister().then(cb);
   // setGroup().then(cb);
-  sendPaymentEmail().then(cb);
+  // sendPaymentEmail().then(cb);
+  // updateGroup().then(cb);
 }

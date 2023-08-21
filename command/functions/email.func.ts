@@ -37,12 +37,13 @@ const specialTag = `
   </div>`;
 
 export async function sendGroupEmail() {
-  const REGIDX = 715;
+  const REGIDX = 119;
   console.log(process.env.SENDGRID_API_KEY);
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const formData = (await getSheet(REGIDX + 13)).filter(
     (row: any[]) => !!row[0],
   );
+  console.log(formData);
   const couponData = (await getCoupon(REGIDX + 2))
     .filter((row: any[]) => !!row[0])
     .map((row: string[]) => row[0]);
