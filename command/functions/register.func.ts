@@ -35,8 +35,8 @@ const COMMON_MAILER = [
 ] as const;
 
 export async function pullFormData() {
-  const ROWNUM = 775; // min = 2
-  const REGIDX = 748;
+  const ROWNUM = 280; // min = 2
+  const REGIDX = 777;
   const LANG: 'kor' | 'eng' = 'kor';
   const formData = (await getForm(ROWNUM, LANG)).filter(
     (row: any[]) => !!row[0],
@@ -197,7 +197,7 @@ function parseRegister(
   orig: Register,
   arr: any[],
 ): { reg: Register; isChanged: boolean } {
-  const updated = {
+  const updated: any = {
     name: arr[0],
     dob: arr[2],
     geo: arr[3],
@@ -205,7 +205,15 @@ function parseRegister(
     joins: arr[7].split(', ').map((x) => Number(x)),
     contact: arr[6],
     group: arr[17] ?? '',
+    isLeader: arr[18] === '조장',
   };
+  if (arr[15] === '완납' || arr[15] === '면제') {
+    updated.payment = 1; //완납
+  } else if (arr[15] === '부분납') {
+    updated.payment = 2; // 부분납
+  } else {
+    updated.payment = 0; // 미납
+  }
   let isChanged = false;
   for (const key of Object.keys(updated)) {
     if (!orig[key] || orig[key].toString() !== updated[key].toString()) {

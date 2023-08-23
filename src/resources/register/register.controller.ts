@@ -72,6 +72,19 @@ export class RegisterController {
     }
   }
 
+  @Post('me/more')
+  async getAdditionalInfo(@Body() userInfo: { email: string }) {
+    try {
+      const register = await this.registerService.getOneRegister(userInfo);
+      const { payment } = register;
+      return { payment };
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      }
+    }
+  }
+
   @Post('search/group')
   async searchGroup(
     @Body() userInfo: { email: string },

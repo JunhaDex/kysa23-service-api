@@ -17,7 +17,7 @@ export async function bootstrap() {
 export async function getSheet(rowNum: number) {
   const sheet = await bootstrap();
   // const range = `general!C${rowNum}:T${rowNum + 100}`;
-  const range = `general!C${rowNum}:T${rowNum + BULK_VOLUME - 1}`; //+100
+  const range = `general!C${rowNum}:W${rowNum + BULK_VOLUME - 1}`; //+100
   const result = await sheet.spreadsheets.values.get({
     spreadsheetId: cred.sheetId,
     range,

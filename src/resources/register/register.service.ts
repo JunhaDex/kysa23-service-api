@@ -103,7 +103,10 @@ export class RegisterService {
           .filter((item: Register) => !!item.isLeader)
           .pop() as Register;
         if (ll) {
-          clean = [ll, clean.filter((item: Register) => item.uid !== ll.uid)];
+          clean = [
+            ll,
+            ...clean.filter((item: Register) => item.uid !== ll.uid),
+          ];
         }
         items.push(...clean);
         count = clean.length;
@@ -142,7 +145,6 @@ export class RegisterService {
         const clean = Object.values(result).filter(
           (item: Register) => item.name === query.name,
         );
-        console.log(clean);
         items.push(...clean);
         count = clean.length;
       }
