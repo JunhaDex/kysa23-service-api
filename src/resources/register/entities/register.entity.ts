@@ -14,6 +14,7 @@ export interface Register {
   // 대회 참여 정보
   group: string;
   isLeader?: boolean;
+  room?: string;
   checkIn: boolean;
   // 데이터 입출력
   createdAt: number; // unix

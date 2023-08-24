@@ -176,6 +176,7 @@ export async function updateRegister() {
     );
     console.log('changed: ', txs.length);
     round++;
+    break;
   }
   console.log(JSON.stringify(txs));
   console.log(JSON.stringify(del));
@@ -206,6 +207,7 @@ function parseRegister(
     contact: arr[6],
     group: arr[17] ?? '',
     isLeader: arr[18] === '조장',
+    room: arr[19] ?? '',
   };
   if (arr[15] === '완납' || arr[15] === '면제') {
     updated.payment = 1; //완납
@@ -216,7 +218,10 @@ function parseRegister(
   }
   let isChanged = false;
   for (const key of Object.keys(updated)) {
-    if (!orig[key] || orig[key].toString() !== updated[key].toString()) {
+    if (
+      orig[key] === undefined ||
+      orig[key].toString() !== updated[key].toString()
+    ) {
       isChanged = true;
       orig[key] = updated[key];
     }

@@ -76,8 +76,8 @@ export class RegisterController {
   async getAdditionalInfo(@Body() userInfo: { email: string }) {
     try {
       const register = await this.registerService.getOneRegister(userInfo);
-      const { payment } = register;
-      return { payment };
+      const { payment, room } = register;
+      return { payment, room };
     } catch (e) {
       if (e.code === 403) {
         throw new HttpException(e.message, HttpStatus.FORBIDDEN);
@@ -113,6 +113,18 @@ export class RegisterController {
   ) {
     try {
       const res = await this.registerService.searchName(userInfo, options);
+      return res;
+    } catch (e) {
+      if (e.code === 403) {
+        throw new HttpException(e.message, HttpStatus.FORBIDDEN);
+      }
+    }
+  }
+
+  @Post('roommate')
+  async searchRoommates(@Body() userInfo: { email: string }) {
+    try {
+      const res = await this.registerService.searchRoommates(userInfo);
       return res;
     } catch (e) {
       if (e.code === 403) {

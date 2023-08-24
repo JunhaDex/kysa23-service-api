@@ -155,6 +155,35 @@ export class RegisterService {
     }
     throw new RegisterError(403, 'Invalid Access');
   }
+
+  async searchRoommates(params: { email: string }) {
+    const document = this.db.ref(DB_NAME);
+    const items = [];
+    let count = 0;
+    const register = await this.getOneRegister(params);
+    if (register) {
+      const room = register.room;
+      if (room) {
+        const groupInst = await document
+          .orderByChild('room')
+          .equalTo(room)
+          .once('value');
+        const result = groupInst.val();
+        if (result) {
+          const clean = Object.values(result).filter(
+            (item: Register) => item.room === room,
+          );
+          items.push(...clean);
+          count = clean.length;
+        }
+      }
+      return {
+        items,
+        count,
+      };
+    }
+    throw new RegisterError(403, 'Invalid Access');
+  }
 }
 
 class RegisterError extends Error {
