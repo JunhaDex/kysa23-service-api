@@ -186,9 +186,8 @@ export class UserService {
     match: number;
     group: number;
   }> {
-    const request = Number(
-      (await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0,
-    );
+    const request =
+      Number((await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0) + 746;
     const match = Number(
       (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
     );
@@ -504,7 +503,7 @@ export class UserService {
       self.ageGroup = me.val().ageGroup;
       return self as User;
     } else {
-      this.logger.warning(`${uid} => invalid uid access`);
+      this.logger.warn(`${uid} => invalid uid access`);
       throw new UserError(401, 'Invalid User');
     }
   }

@@ -33,12 +33,13 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL
 #   "password": "184480",
 #   "fcm": "foo-bar"
 # }
-POST https://api.kysa.page/user/login
+#POST https://api.kysa.page/user/login
+POST http://localhost:3000/user/login
 Content-Type: application/json
 
 {
-  "email": "rlarlfah303@gmail.com",
-  "password": "388200",
+  "email": "kjunha77@gmail.com",
+  "password": "690830",
   "fcm": "foo-bar"
 }
 
@@ -48,9 +49,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJZbWxzYkhrM09VQnVZWFpsY2k1amIyMD0iLCJuYW1lIjoi6rCV7Jqp7ISxIiwiZG9iIjoiMjAwMS8wOC8wOSIsImlhdCI6MTY4MzI5Mzk2Mn0.Zxz8TfEroSWiYScPJVP1beccsT9YxyFMU1DqoJtrU9U
 
 ### Get User List
-GET https://api.kysa.page/user/list
+GET https://api.kysa.page/user/list?group=0
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJjbXhoY214bVlXZ3pNRE5BWjIxaGFXd3VZMjl0IiwibmFtZSI6Iuq5gOq4uOuqqCIsImRvYiI6IjE5OTIvMDMvMTciLCJpYXQiOjE2ODQ1NjM2MTR9.W9TsOYFdxvsmBkf5aweN_PlqUGgv3tQmu-5mneuG190
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhMnAxYm1oaE56ZEFaMjFoYVd3dVkyOXQiLCJuYW1lIjoi6rmA7KSA7ZWYIiwiZG9iIjoiMTk5My8wMi8xNSIsImlhdCI6MTY5MzAxNjA0Mn0.vXM73ZRp3PoPthBa9t3ET_m8fnKyddYPOrRFsBDxgRI
 
 ### Update User
 PATCH https://api.kysa.page/user/my
