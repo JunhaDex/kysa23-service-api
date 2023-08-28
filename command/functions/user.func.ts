@@ -133,6 +133,26 @@ export async function resetDaily() {
   await db.ref('inbox').update(inns);
 }
 
+export async function searchMe() {
+  const tg = '';
+  const app = await getFirebase();
+  const db = getDatabase(app);
+  const outBoxes = await db.ref('match').once('value');
+  const outs = outBoxes.val();
+  const whos = [];
+  if (outBoxes.val()) {
+    for (const out of Object.values(outs)) {
+      for (const item of Object.keys(out)) {
+        if (item === btoa(tg)) {
+          whos.push(atob(out[item].from));
+          break;
+        }
+      }
+    }
+  }
+  console.log({ count: whos.length, items: whos.join('\r\n') });
+}
+
 // send user pwd email
 export async function sendUserPwd() {
   console.log(process.env.SENDGRID_API_KEY);

@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import {
   createAppUser,
   resetDaily,
+  searchMe,
   sendUserPwd,
   setDailyCount,
 } from './functions/user.func';
@@ -52,4 +53,5 @@ if (options.updateUser) {
   // sendPaymentEmail().then(cb);
   // updateGroup().then(cb);
   resetDaily().then(cb);
+  // searchMe().then(cb);
 }
