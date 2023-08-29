@@ -1,6 +1,6 @@
 import { Response } from '@/types/general.type';
 
-export const PAGE_SIZE = 20;
+export const PAGE_SIZE = 25;
 
 export function unixNow(): number {
   return Math.floor(new Date().getTime() / 1000);
@@ -52,7 +52,6 @@ export function paginateUser(
     }
   }
   // console.log(pgn.list.map((i) => i.group));
-  console.log(pgn.list);
   pgn.count = pgn.list.length;
   pgn.list.sort((a, b) => {
     const an = a.group ? Number(a.group.substring(1)) : 99;

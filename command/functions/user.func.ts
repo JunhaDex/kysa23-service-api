@@ -41,23 +41,25 @@ export async function createAppUser() {
   const registers = snapRef.val() ?? {};
   // #### Add Custom User ####
   // const registers = {};
-  // registers[btoa('test.user.m@google.com')] = {
+  // registers[btoa('test.user.f@kysa.page')] = {
   //   consent: 1688168263,
   //   contact: '01012341233',
   //   createdAt: 1688304189,
   //   dob: '1997/10/20',
-  //   email: 'test.user.m@google.com',
+  //   email: 'test.user.f@kysa.page',
   //   geo: '서울 강남',
   //   isMember: true,
   //   joins: [25, 26, 27],
-  //   name: 'Test User M',
-  //   sex: 'm',
-  //   uid: btoa('test.user.m@google.com'),
+  //   name: 'Test User F',
+  //   sex: 'f',
+  //   uid: btoa('test.user.f@kysa.page'),
   // };
   const users = snapUser.val() ?? {};
   const target = Object.keys(registers).filter(
     (key) => !Object.keys(users).includes(key),
   );
+  // #### Add Custom User ####
+  // const target = Object.keys(registers);
   const newUsrCount = target.length;
   const ans = await inquirer.prompt([
     {
@@ -134,7 +136,7 @@ export async function resetDaily() {
 }
 
 export async function searchMe() {
-  const tg = '';
+  const tg = 'kjunha77@gmail.com';
   const app = await getFirebase();
   const db = getDatabase(app);
   const outBoxes = await db.ref('match').once('value');
@@ -150,7 +152,7 @@ export async function searchMe() {
       }
     }
   }
-  console.log({ count: whos.length, items: whos.join('\r\n') });
+  console.log({ count: whos.length, items: whos.join(', ') });
 }
 
 // send user pwd email
