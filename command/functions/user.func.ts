@@ -136,7 +136,7 @@ export async function resetDaily() {
 }
 
 export async function searchMe() {
-  const tg = 'kjunha77@gmail.com';
+  const tg = '';
   const app = await getFirebase();
   const db = getDatabase(app);
   const outBoxes = await db.ref('match').once('value');

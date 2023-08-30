@@ -187,7 +187,7 @@ export class UserService {
     group: number;
   }> {
     const request =
-      Number((await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0) + 2254;
+      Number((await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0) + 2449;
     const match = Number(
       (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
     );
