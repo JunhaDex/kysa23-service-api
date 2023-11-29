@@ -11,6 +11,6 @@ steps:
   # deploy
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: [ 'run', 'deploy', 'kysa23-service-api', '--image', 'gcr.io/kysa23-project/kysa23-service-api', '--region', 'us-central1' ]
+    args: [ 'run', 'deploy', 'kysa23-service-api', '--image', 'gcr.io/kysa23-project/kysa23-service-api', '--region', 'us-central1', '--port', '3000' ]
 images:
   - 'gcr.io/kysa23-project/kysa23-service-api'
