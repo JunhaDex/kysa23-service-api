@@ -186,12 +186,13 @@ export class UserService {
     match: number;
     group: number;
   }> {
-    const request =
-      Number((await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0) + 2449;
+    const request = Number(
+      (await this.cacheManager.get(REG_COUNT_CACHE_KEY)) ?? 0,
+    );
     const match = Number(
       (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
     );
-    const group = 33;
+    const group = 1;
     return { request, match, group };
   }
 

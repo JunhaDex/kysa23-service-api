@@ -6,7 +6,7 @@
     "kysa23-project": {
       "hosting": {
         "api": [
-          "kysa23-service"
+          "kysa23-api"
         ]
       }
     }
