@@ -192,7 +192,7 @@ export class UserService {
     const match = Number(
       (await this.cacheManager.get(MATCH_COUNT_CACHE_KEY)) ?? 0,
     );
-    const group = 1;
+    const group = 2;
     return { request, match, group };
   }
 
